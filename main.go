@@ -1,22 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"unicode"
+	"github.com/Epic55/go_project_jwt_oauth/db"
+	"github.com/Epic55/go_project_jwt_oauth/routes"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
-	var l1 int
-	var s1 string = "abcd"
-	l1 = len(s1)
-	if l1 < 4 || l1 > 25 {
-		fmt.Println("F")
-	} else {
-		fmt.Println("T")
-	}
-	fmt.Println(string(s1[0]))
-	fmt.Println(s1[0:1])
-	if unicode.IsLetter(string(s1[0])) {
-		fmt.Println("T")
-	}
+	db.DBconn()
+
+	app := fiber.New()
+	app.Use(cors.New(cors.Config{
+		AllowCredentials: true, //Very important while using a HTTPonly Cookie, frontend can easily get and return back the cookie.
+	}))
+	routes.Setup(app)
+	app.Listen("localhost:8080")
 }
