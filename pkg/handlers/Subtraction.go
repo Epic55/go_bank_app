@@ -46,21 +46,28 @@ func (h handler) Subtraction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	date1 := time.Now()
-	updatedBalance := account.Balance - updatedAccount.Balance
 
-	//fmt.Println(updatedBalance, account.Balance, updatedAccount.Balance)
+	if account.Balance >= updatedAccount.Balance {
+		updatedBalance := account.Balance - updatedAccount.Balance
 
-	queryStmt2 := `UPDATE accounts SET balance = $2, date = $3 WHERE id = $1 RETURNING id;`
-	err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, date1).Scan(&id)
-	fmt.Println("Balance is substracted on", updatedAccount.Balance, "Result:", updatedBalance)
-	if err != nil {
-		log.Println("failed to execute query", err)
-		w.WriteHeader(500)
-		return
+		queryStmt2 := `UPDATE accounts SET balance = $2, date = $3 WHERE id = $1 RETURNING id;`
+		err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, date1).Scan(&id)
+		fmt.Println("Balance is substracted on", updatedAccount.Balance, "Result:", updatedBalance)
+		if err != nil {
+			log.Println("failed to execute query", err)
+			w.WriteHeader(500)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("Balances is updated")
+	} else {
+		fmt.Println("Not enough money")
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("Not enough money")
 	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Balances is updated")
 
 }

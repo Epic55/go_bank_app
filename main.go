@@ -23,11 +23,12 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/accounts", h.GetAllAccounts).Methods(http.MethodGet)
 	myRouter.HandleFunc("/accounts/{id}", h.GetAccount).Methods(http.MethodGet)
+	myRouter.HandleFunc("/accounts/{id}", h.DeleteAccount).Methods(http.MethodDelete)
 	myRouter.HandleFunc("/accounts/a/{id}", h.Addition).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/s/{id}", h.Subtraction).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/t/{id}/{id2}", h.Transfer).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/t2/{id}/{id2}", h.Transfer2).Methods(http.MethodPut)
-	myRouter.HandleFunc("/accounts/{id}", h.DeleteAccount).Methods(http.MethodDelete)
+
 	log.Fatal(http.ListenAndServe("localhost:8080", myRouter))
 	fmt.Println("Listening in port 8080")
 }

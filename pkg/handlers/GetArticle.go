@@ -24,6 +24,7 @@ func (h handler) GetAccount(w http.ResponseWriter, r *http.Request) {
 	var account models.Account
 	for results.Next() {
 		err = results.Scan(&account.Id, &account.Name, &account.Balance, &account.Date)
+		//fmt.Println(results)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)
