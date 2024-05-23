@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h handler) Subtraction(w http.ResponseWriter, r *http.Request) {
+func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 

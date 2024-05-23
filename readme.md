@@ -1,13 +1,30 @@
-API METHODS:
-1) GET - localhost:8080/accounts/
-2) GET - localhost:8080/accounts/1
-3) GET - localhost:8080/accounts/2
-4) ADDITION - localhost:8080/accounts/a/1
-5) SUBTRACTION - localhost:8080/accounts/s/1
-6) TRANSFER 1 - localhost:8080/accounts/t/1/2
-7) TRANSFER 2 - localhost:8080/accounts/t2/1/2
+#WHAT NEED TO DO:
+- add type of addiction to balance
+- add currency of balance
+- do several accounts for user
+- block account
 
-json body:
+- look history of operations (topup, withdraw, transfers, payments)
+
+- buy payments
+- history of payments
+
+- transfers btwn my accounts
+- history of transfers
+- convert/transfer to another account in another currency
+
+- authentication
+
+
+#API METHODS (OPERATIONS WITH ACCOUNT):
+1) LOOK ALL ACCOUNTS - GET - localhost:8080/accounts/
+2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
+3) TOPUP AN ACCOUNT - POST - localhost:8080/accounts/topup/ID
+4) WITHDRAW FROM ACCOUNT - POST - localhost:8080/accounts/withdraw/ID
+5) TRANSFER BTWN USERS - POST - localhost:8080/accounts/transfer/ID/ID
+6) DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
+
+#JSON BODY FOR API METHODS:
 {
   "Balance": 30
 }
