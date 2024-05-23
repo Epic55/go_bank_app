@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/janirefdez/ArticleRestApi/pkg/mocks"
+	"github.com/epic55/AccountRestApi/pkg/mocks"
 	_ "github.com/lib/pq"
 )
 
@@ -15,7 +15,7 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "1"
-	dbname   = "db1"
+	dbname   = "postgres"
 )
 
 func Connect() *sql.DB {

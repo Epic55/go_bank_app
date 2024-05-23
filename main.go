@@ -6,14 +6,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/epic55/AccountRestApi/pkg/db"
+	"github.com/epic55/AccountRestApi/pkg/handlers"
 	"github.com/gorilla/mux"
-	"github.com/janirefdez/ArticleRestApi/pkg/db"
-	"github.com/janirefdez/ArticleRestApi/pkg/handlers"
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the ccount REST API!")
-	fmt.Println("ccount REST API")
+	fmt.Fprintf(w, "Welcome to the account REST API!")
+	fmt.Println("Account REST API")
 }
 
 func handleRequests(DB *sql.DB) {
@@ -24,10 +24,10 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/accounts", h.GetAllAccounts).Methods(http.MethodGet)
 	myRouter.HandleFunc("/accounts/{id}", h.GetAccount).Methods(http.MethodGet)
 	myRouter.HandleFunc("/accounts/{id}", h.DeleteAccount).Methods(http.MethodDelete)
-	myRouter.HandleFunc("/accounts/a/{id}", h.Addition).Methods(http.MethodPut)
-	myRouter.HandleFunc("/accounts/s/{id}", h.Subtraction).Methods(http.MethodPut)
-	myRouter.HandleFunc("/accounts/t/{id}/{id2}", h.Transfer).Methods(http.MethodPut)
-	myRouter.HandleFunc("/accounts/t2/{id}/{id2}", h.Transfer2).Methods(http.MethodPut)
+	myRouter.HandleFunc("/accounts/addition/{id}", h.Addition).Methods(http.MethodPut)
+	myRouter.HandleFunc("/accounts/subtraction/{id}", h.Subtraction).Methods(http.MethodPut)
+	myRouter.HandleFunc("/accounts/transfer/{id}/{id2}", h.Transfer).Methods(http.MethodPut)
+	myRouter.HandleFunc("/accounts/transfer2/{id}/{id2}", h.Transfer2).Methods(http.MethodPut)
 
 	log.Fatal(http.ListenAndServe("localhost:8080", myRouter))
 	fmt.Println("Listening in port 8080")

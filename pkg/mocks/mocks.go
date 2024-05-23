@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/janirefdez/ArticleRestApi/pkg/models"
+import "github.com/epic55/AccountRestApi/pkg/models"
 
 var Accounts = []models.Account{
 	{Id: 1, Name: "Epic", Balance: 100, Date: "2024-01-17"},

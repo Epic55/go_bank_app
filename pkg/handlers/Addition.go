@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/epic55/AccountRestApi/pkg/models"
 	"github.com/gorilla/mux"
-	"github.com/janirefdez/ArticleRestApi/pkg/models"
 )
 
 func (h handler) Addition(w http.ResponseWriter, r *http.Request) {

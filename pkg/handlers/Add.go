@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/janirefdez/ArticleRestApi/pkg/models"
+	"github.com/epic55/AccountRestApi/pkg/models"
 )
 
 func (h handler) Add(w http.ResponseWriter, r *http.Request) {

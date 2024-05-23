@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/epic55/AccountRestApi/pkg/models"
 	"github.com/gorilla/mux"
-	"github.com/janirefdez/ArticleRestApi/pkg/models"
 )
 
 func (h handler) GetAccount(w http.ResponseWriter, r *http.Request) {
