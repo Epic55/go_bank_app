@@ -6,4 +6,5 @@ type Account struct {
 	Balance  int    `json:"balance"`
 	Currency string `json:"currency"`
 	Date     string `json:"date"`
+	Blocked  bool   `json:"blocked"`
 }

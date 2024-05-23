@@ -37,7 +37,7 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 
 	var account models.Account
 	for results.Next() {
-		err = results.Scan(&account.Id, &account.Name, &account.Balance, &account.Currency, &account.Date)
+		err = results.Scan(&account.Id, &account.Name, &account.Balance, &account.Currency, &account.Date, &account.Blocked)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)
@@ -46,28 +46,35 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	date1 := time.Now()
+	if account.Blocked == false {
 
-	if account.Balance >= updatedAccount.Balance {
-		updatedBalance := account.Balance - updatedAccount.Balance
+		if account.Balance >= updatedAccount.Balance {
+			updatedBalance := account.Balance - updatedAccount.Balance
 
-		queryStmt2 := `UPDATE accounts SET balance = $2, currency = $4, date = $3 WHERE id = $1 RETURNING id;`
-		err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
-		fmt.Println("Balance is substracted on", updatedAccount.Balance, "Result:", updatedBalance)
-		if err != nil {
-			log.Println("failed to execute query", err)
-			w.WriteHeader(500)
-			return
+			queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
+			err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
+			fmt.Println("Balance is substracted on", updatedAccount.Balance, "Result:", updatedBalance)
+			if err != nil {
+				log.Println("failed to execute query", err)
+				w.WriteHeader(500)
+				return
+			}
+
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Balances is updated")
+		} else {
+			fmt.Println("Not enough money")
+
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode("Not enough money")
 		}
-
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("Balances is updated")
 	} else {
-		fmt.Println("Not enough money")
-
+		fmt.Println("Operation is not permitted. Account is blocked. Name -", account.Name, "ID -", account.Id)
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("Not enough money")
+		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
 	}
 
 }

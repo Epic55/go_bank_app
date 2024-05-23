@@ -49,7 +49,7 @@ func CreateTable(db *sql.DB) {
 		return
 	}
 	if !exists {
-		results, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(100) NOT NULL, balance int NOT NULL, currency VARCHAR(100) NOT NULL, date VARCHAR(100) NOT NULL);")
+		results, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(100) NOT NULL, balance int NOT NULL, currency VARCHAR(100) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
@@ -57,10 +57,10 @@ func CreateTable(db *sql.DB) {
 		log.Println("Table created successfully", results)
 
 		for _, account := range mocks.Accounts {
-			queryStmt := `INSERT INTO accounts (name,balance,currency,date) VALUES ($1, $2, $3, $4) RETURNING id;`
+			queryStmt := `INSERT INTO accounts (name,balance,currency,date,blocked) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
 
 			date1 := time.Now()
-			err := db.QueryRow(queryStmt, &account.Name, &account.Balance, &account.Currency, date1).Scan(&account.Id)
+			err := db.QueryRow(queryStmt, &account.Name, &account.Balance, &account.Currency, date1, &account.Blocked).Scan(&account.Id)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				return

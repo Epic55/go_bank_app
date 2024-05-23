@@ -1,11 +1,9 @@
 #WHAT NEED TO DO:
-
-- add currency of balance
 - do several accounts for user
 - block account
 
 - look history of operations (topup, withdraw, transfers, payments)
-- add type of addiction to balance
+- add type of topup to balance
 
 - buy payments
 - history of payments
@@ -15,6 +13,10 @@
 - convert/transfer to another account in another currency
 
 - authentication
+
+DONE:
+- add currency of balance
+
 
 
 #API METHODS (OPERATIONS WITH ACCOUNT):
