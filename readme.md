@@ -1,10 +1,11 @@
 #WHAT NEED TO DO:
-- add type of addiction to balance
+
 - add currency of balance
 - do several accounts for user
 - block account
 
 - look history of operations (topup, withdraw, transfers, payments)
+- add type of addiction to balance
 
 - buy payments
 - history of payments
