@@ -17,18 +17,16 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	id2 := vars["id2"]
 
-	// Read request body
 	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-
+	body, err := io.ReadAll(r.Body) // Read request body
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	date1 := time.Now()
 
-	var updatedAccountSender models.Account
-	json.Unmarshal(body, &updatedAccountSender)
+	var changesToAccountSender models.Account
+	json.Unmarshal(body, &changesToAccountSender)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
 	results, err := h.DB.Query(queryStmt, id)
@@ -47,46 +45,56 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if accountSender.Blocked == false {
-		if accountSender.Balance >= updatedAccountSender.Balance {
-			updatedBalanceSender := accountSender.Balance - updatedAccountSender.Balance
+
+	//RECEIVER USER
+	var changesToAccountAccountReceiver models.Account
+	json.Unmarshal(body, &changesToAccountAccountReceiver)
+
+	queryStmt3 := `SELECT * FROM accounts WHERE id = $1 ;`
+	results2, err := h.DB.Query(queryStmt3, id2)
+	if err != nil {
+		log.Println("failed to execute query", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	var accountReceiver models.Account
+	for results2.Next() {
+		err = results2.Scan(&accountReceiver.Id, &accountReceiver.Name, &accountReceiver.Balance, &accountReceiver.Currency, &accountReceiver.Date, &accountReceiver.Blocked)
+		if err != nil {
+			log.Println("failed to scan", err)
+			w.WriteHeader(500)
+			return
+		}
+	}
+
+	if accountSender.Blocked == true || accountReceiver.Blocked == true {
+
+		fmt.Println("Operation is not permitted. Account is blocked -")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
+
+	} else {
+
+		if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
+
+			updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
 
 			queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE id = $1 RETURNING id;`
 			err = h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date1).Scan(&id)
-			fmt.Println("Sender balance is substracted on", updatedAccountSender.Balance, "Result:", updatedBalanceSender)
+			fmt.Println("Sender balance is withdrawed on", changesToAccountSender.Balance, "Result:", updatedBalanceSender)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				w.WriteHeader(500)
 				return
 			}
 
-			//2ND USER
-			var updatedAccountReceiver models.Account
-			json.Unmarshal(body, &updatedAccountReceiver)
-
-			queryStmt3 := `SELECT * FROM accounts WHERE id = $1 ;`
-			results2, err := h.DB.Query(queryStmt3, id2)
-			if err != nil {
-				log.Println("failed to execute query", err)
-				w.WriteHeader(500)
-				return
-			}
-
-			var accountReceiver models.Account
-			for results2.Next() {
-				err = results2.Scan(&accountReceiver.Id, &accountReceiver.Name, &accountReceiver.Balance, &accountReceiver.Currency, &accountReceiver.Date, &accountReceiver.Blocked)
-				if err != nil {
-					log.Println("failed to scan", err)
-					w.WriteHeader(500)
-					return
-				}
-			}
-
-			updatedBalanceReceiver := accountReceiver.Balance + updatedAccountReceiver.Balance
+			updatedBalanceReceiver := accountReceiver.Balance + changesToAccountAccountReceiver.Balance
 
 			queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE id = $1 RETURNING id;`
 			err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
-			fmt.Println("Receiver balance is topped up on", updatedAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
+			fmt.Println("Receiver balance is topped up on", changesToAccountAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				w.WriteHeader(500)
@@ -96,6 +104,7 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Balances is updated")
+
 		} else {
 			fmt.Println("Not enough money")
 
@@ -103,11 +112,7 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Not enough money")
 		}
-	} else {
-		fmt.Println("Operation is not permitted. Account is blocked -")
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
+
 	}
 
 }

@@ -27,7 +27,7 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/accounts/topup/{id}", h.Topup).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/withdraw/{id}", h.Withdraw).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/transfer/{id}/{id2}", h.Transfer).Methods(http.MethodPut)
-	//myRouter.HandleFunc("/accounts/transfer2/{id}/{id2}", h.Transfer2).Methods(http.MethodPut)
+	myRouter.HandleFunc("/accounts/blocking/{id}", h.BlockAccount).Methods(http.MethodPut)
 
 	log.Fatal(http.ListenAndServe("localhost:8080", myRouter))
 	fmt.Println("Listening in port 8080")

@@ -24,8 +24,8 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	var updatedAccount models.Account
-	json.Unmarshal(body, &updatedAccount)
+	var changesToAccount models.Account
+	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
 	results, err := h.DB.Query(queryStmt, id)
@@ -48,12 +48,12 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	date1 := time.Now()
 	if account.Blocked == false {
 
-		if account.Balance >= updatedAccount.Balance {
-			updatedBalance := account.Balance - updatedAccount.Balance
+		if account.Balance >= changesToAccount.Balance {
+			updatedBalance := account.Balance - changesToAccount.Balance
 
 			queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
 			err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
-			fmt.Println("Balance is substracted on", updatedAccount.Balance, "Result:", updatedBalance)
+			fmt.Println("Balance is substracted on", changesToAccount.Balance, "Result:", updatedBalance)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				w.WriteHeader(500)
@@ -63,6 +63,7 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Balances is updated")
+
 		} else {
 			fmt.Println("Not enough money")
 
@@ -70,6 +71,7 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Not enough money")
 		}
+
 	} else {
 		fmt.Println("Operation is not permitted. Account is blocked. Name -", account.Name, "ID -", account.Id)
 		w.Header().Add("Content-Type", "application/json")
