@@ -1,6 +1,5 @@
 #WHAT NEED TO DO:
 - look history of operations (topup, withdraw, transfers, payments)
-- add type of operation to history
 
 - buy payments
 - history of payments

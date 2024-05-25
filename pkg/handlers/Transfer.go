@@ -105,6 +105,24 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Balances is updated")
 
+			queryStmt3 := `INSERT INTO history (username, typeofoperation, quantity, currency, date) VALUES ($1, $2, $3, $4, $5);`
+			_, err = h.DB.Exec(queryStmt3, accountSender.Name, "transfer", changesToAccountSender.Balance, accountSender.Currency, date1) //USE Exec FOR INSERT
+			if err != nil {
+				log.Println("failed to execute query - update history:", err)
+				return
+			} else {
+				fmt.Println("History is updated")
+			}
+
+			queryStmt3 = `INSERT INTO history (username, typeofoperation, quantity, currency, date) VALUES ($1, $2, $3, $4, $5);`
+			_, err = h.DB.Exec(queryStmt3, accountReceiver.Name, "topup from user", changesToAccountAccountReceiver.Balance, accountReceiver.Currency, date1) //USE Exec FOR INSERT
+			if err != nil {
+				log.Println("failed to execute query - update history:", err)
+				return
+			} else {
+				fmt.Println("History is updated")
+			}
+
 		} else {
 			fmt.Println("Not enough money")
 

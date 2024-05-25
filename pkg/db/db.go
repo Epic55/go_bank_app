@@ -55,12 +55,27 @@ func CreateTable(db *sql.DB) {
 	}
 
 	if !exists {
-		results, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, balance int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL);")
+		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, typeofoperation VARCHAR(20) NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
+
+		} else {
+			log.Println("Table History created successfully")
 		}
-		log.Println("Table created successfully", results)
+
+	} else {
+		log.Println("Table 'history' already exists ")
+	}
+
+	if !exists {
+		_, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, balance int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL);")
+		if err != nil {
+			log.Println("failed to execute query", err)
+			return
+		} else {
+			log.Println("Table Account created successfully")
+		}
 
 		for _, account := range mocks.Accounts {
 			queryStmt := `INSERT INTO accounts (name,balance,currency,date,blocked) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
@@ -72,32 +87,9 @@ func CreateTable(db *sql.DB) {
 				return
 			}
 		}
-		log.Println("Mock accounts included in Table", results)
+		log.Println("Mock accounts included in Table")
 	} else {
 		log.Println("Table 'account' already exists ")
-	}
-
-	if !exists {
-		results, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, typeofoperation VARCHAR(20) NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL);")
-		if err != nil {
-			log.Println("failed to execute query", err)
-			return
-		}
-		log.Println("Table created successfully", results)
-
-		for _, history := range mocks.History {
-			queryStmt := `INSERT INTO accounts (name,balance,currency,date,blocked) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
-
-			date1 := time.Now()
-			err := db.QueryRow(queryStmt, &history.Username, &history.Typeofoperation, &history.quantity, &history.Currency, date1, &history.Blocked).Scan(&history.Id)
-			if err != nil {
-				log.Println("failed to execute query", err)
-				return
-			}
-		}
-		log.Println("Mock history included in Table", results)
-	} else {
-		log.Println("Table 'history' already exists ")
 	}
 
 }

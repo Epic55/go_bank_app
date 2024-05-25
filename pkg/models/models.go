@@ -11,8 +11,8 @@ type Account struct {
 }
 
 type History struct {
-	Id              int    `json:"Id"`
-	Username        string `json:"username"`
+	Id              int    `json:"Id,omitempty"`
+	Username        string `json:"username,omitempty"`
 	Typeofoperation string `json:"typeofoperation"`
 	Quantity        int    `json:"quantity"`
 	Currency        string `json:"currency"`

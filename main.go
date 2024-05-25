@@ -23,6 +23,7 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/accounts", h.GetAllAccounts).Methods(http.MethodGet)
 	myRouter.HandleFunc("/accounts/{id}", h.GetAccount).Methods(http.MethodGet)
+	myRouter.HandleFunc("/history/{username}", h.GetHistory).Methods(http.MethodGet)
 	myRouter.HandleFunc("/accounts/delete/{id}", h.DeleteAccount).Methods(http.MethodDelete)
 	myRouter.HandleFunc("/accounts/topup/{id}", h.Topup).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/withdraw/{id}", h.Withdraw).Methods(http.MethodPut)

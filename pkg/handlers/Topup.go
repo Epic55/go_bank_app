@@ -45,8 +45,6 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println("Account - ", account)
-	fmt.Println("changesToAccount - ", changesToAccount)
 
 	date1 := time.Now()
 	if account.Blocked == false {
@@ -54,16 +52,26 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 
 		queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
 		err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
-		fmt.Println("Balance is added on ", changesToAccount.Balance, "Result: ", updatedBalance)
 		if err != nil {
-			log.Println("failed to execute query", err)
+			log.Println("failed to execute query - topup:", err)
 			w.WriteHeader(500)
 			return
+		} else {
+			fmt.Println("Balance is added on ", changesToAccount.Balance, "Result: ", updatedBalance)
 		}
 
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode("Balance is added on")
+
+		queryStmt3 := `INSERT INTO history (username, typeofoperation, quantity, currency, date) VALUES ($1, $2, $3, $4, $5);`
+		_, err = h.DB.Exec(queryStmt3, account.Name, "topup", changesToAccount.Balance, account.Currency, date1) //USE Exec FOR INSERT
+		if err != nil {
+			log.Println("failed to execute query - update history:", err)
+			return
+		} else {
+			fmt.Println("History is updated")
+		}
 
 	} else {
 		fmt.Println("Operation is not permitted. Account is blocked. Name -", account.Name, "ID -", account.Id)
