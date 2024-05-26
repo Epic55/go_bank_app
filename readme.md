@@ -1,9 +1,4 @@
 #WHAT NEED TO DO:
-- look history of operations (topup, withdraw, transfers, payments)
-
-- buy payments
-- history of payments
-
 - do several accounts for user
 - transfers btwn my accounts
 - convert/transfer to another account in another currency
@@ -16,7 +11,9 @@
 DONE:
 - add currency of balance
 - block account
-
+- look history of operations
+- buy payments
+- history of payments
 
 
 #API METHODS (OPERATIONS WITH ACCOUNT):
@@ -27,8 +24,15 @@ DONE:
 5) TRANSFER BTWN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
 6) DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
 7) BLOCK ACCOUNT - PUT - localhost:8080/accounts/blocking/ID
+8) LOOK HISTORY - GET - localhost:8080/history/USERNAME
+9) PAYMENTS - PUT - localhost:8080/payments/ID
+10) LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
 
 #JSON BODY FOR API METHODS:
 {
   "Balance": 30
+}
+{
+  "Balance": 20,
+  "Service": "tele2"
 }

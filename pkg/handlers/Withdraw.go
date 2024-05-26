@@ -64,8 +64,8 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Balances is updated")
 
-			queryStmt3 := `INSERT INTO history (username, typeofoperation, quantity, currency, date) VALUES ($1, $2, $3, $4, $5);`
-			_, err = h.DB.Exec(queryStmt3, account.Name, "withdraw", changesToAccount.Balance, account.Currency, date1) //USE Exec FOR INSERT
+			queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+			_, err = h.DB.Exec(queryStmt3, account.Name, date1, changesToAccount.Balance, account.Currency, "withdraw") //USE Exec FOR INSERT
 			if err != nil {
 				log.Println("failed to execute query - update history:", err)
 				return

@@ -54,8 +54,27 @@ func CreateTable(db *sql.DB) {
 		return
 	}
 
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'payments' );").Scan(&exists); err != nil {
+		log.Println("failed to execute query", err)
+		return
+	}
+
 	if !exists {
-		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, typeofoperation VARCHAR(20) NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL);")
+		_, err := db.Query("CREATE TABLE payments (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, service VARCHAR(20) NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL);")
+		if err != nil {
+			log.Println("failed to execute query", err)
+			return
+
+		} else {
+			log.Println("Table Payments created successfully")
+		}
+
+	} else {
+		log.Println("Table 'Payments' already exists ")
+	}
+
+	if !exists {
+		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, typeofoperation VARCHAR(30) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
