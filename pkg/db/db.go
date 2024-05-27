@@ -44,7 +44,7 @@ func CloseConnection(db *sql.DB) {
 
 func CreateTable(db *sql.DB) {
 	var exists bool
-	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'accounts' );").Scan(&exists); err != nil {
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users' );").Scan(&exists); err != nil {
 		log.Println("failed to execute query", err)
 		return
 	}
@@ -59,33 +59,56 @@ func CreateTable(db *sql.DB) {
 		return
 	}
 
-	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'accountdata' );").Scan(&exists); err != nil {
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'accounts' );").Scan(&exists); err != nil {
 		log.Println("failed to execute query", err)
 		return
 	}
 
 	if !exists {
-		_, err := db.Query("CREATE TABLE accountdata (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, account int NOT NULL, balance int NOT NULL, currency VARCHAR(3) NOT NULL, blocked BOOLEAN NOT NULL);")
+		_, err := db.Query("CREATE TABLE users (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
 		} else {
-			log.Println("Table accountdata created successfully")
+			log.Println("Table Users created successfully")
 		}
 
-		for _, account := range mocks.Accountdata {
-			queryStmt := `INSERT INTO accountdata (name,account,balance,currency,blocked) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
+		for _, user := range mocks.Users {
+			queryStmt := `INSERT INTO users (name) VALUES ($1);`
 
-			date1 := time.Now()
-			err := db.QueryRow(queryStmt, &account.Name, &account.Account, &account.Balance, &account.Currency, &account.Blocked).Scan(&account.Id)
+			_, err := db.Exec(queryStmt, &user.Name)
+			//err := db.QueryRow(queryStmt, &user.Name).Scan(&user.Id)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				return
 			}
 		}
-		log.Println("Mock accountdata included in Table")
+		log.Println("Mock users included in Table")
 	} else {
-		log.Println("Table 'accountdata' already exists ")
+		log.Println("Table 'users' already exists ")
+	}
+
+	if !exists {
+		_, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, account VARCHAR(20) NOT NULL, balance int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL);")
+		if err != nil {
+			log.Println("failed to execute query", err)
+			return
+		} else {
+			log.Println("Table accounts created successfully")
+		}
+
+		for _, account := range mocks.Accounts {
+			queryStmt := `INSERT INTO accounts (name,account,balance,currency,date,blocked) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;`
+			date1 := time.Now()
+			err := db.QueryRow(queryStmt, &account.Name, &account.Account, &account.Balance, &account.Currency, date1, &account.Blocked).Scan(&account.Id)
+			if err != nil {
+				log.Println("failed to execute query", err)
+				return
+			}
+		}
+		log.Println("Mock accounts included in Table")
+	} else {
+		log.Println("Table 'accounts' already exists ")
 	}
 
 	if !exists {
@@ -95,11 +118,11 @@ func CreateTable(db *sql.DB) {
 			return
 
 		} else {
-			log.Println("Table Payments created successfully")
+			log.Println("Table payments created successfully")
 		}
 
 	} else {
-		log.Println("Table 'Payments' already exists ")
+		log.Println("Table 'payments' already exists ")
 	}
 
 	if !exists {
@@ -109,35 +132,11 @@ func CreateTable(db *sql.DB) {
 			return
 
 		} else {
-			log.Println("Table History created successfully")
+			log.Println("Table history created successfully")
 		}
 
 	} else {
 		log.Println("Table 'history' already exists ")
-	}
-
-	if !exists {
-		_, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, balance int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL);")
-		if err != nil {
-			log.Println("failed to execute query", err)
-			return
-		} else {
-			log.Println("Table Account created successfully")
-		}
-
-		for _, account := range mocks.Accounts {
-			queryStmt := `INSERT INTO accounts (name,balance,currency,date,blocked) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
-
-			date1 := time.Now()
-			err := db.QueryRow(queryStmt, &account.Name, &account.Balance, &account.Currency, date1, &account.Blocked).Scan(&account.Id)
-			if err != nil {
-				log.Println("failed to execute query", err)
-				return
-			}
-		}
-		log.Println("Mock accounts included in Table")
-	} else {
-		log.Println("Table 'account' already exists ")
 	}
 
 }

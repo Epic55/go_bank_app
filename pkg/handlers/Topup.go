@@ -38,7 +38,7 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 
 	var account models.Account //CURRENT INFO ABT ACCOUNT
 	for results.Next() {
-		err = results.Scan(&account.Id, &account.Name, &account.Balance, &account.Currency, &account.Date, &account.Blocked)
+		err = results.Scan(&account.Id, &account.Name, &account.Account, &account.Balance, &account.Currency, &account.Date, &account.Blocked)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)

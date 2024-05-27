@@ -38,7 +38,7 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 
 	var accountSender models.Account
 	for results.Next() {
-		err = results.Scan(&accountSender.Id, &accountSender.Name, &accountSender.Balance, &accountSender.Currency, &accountSender.Date, &accountSender.Blocked)
+		err = results.Scan(&accountSender.Id, &accountSender.Name, &accountSender.Account, &accountSender.Balance, &accountSender.Currency, &accountSender.Date, &accountSender.Blocked)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)
@@ -60,7 +60,7 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 
 	var accountReceiver models.Account
 	for results2.Next() {
-		err = results2.Scan(&accountReceiver.Id, &accountReceiver.Name, &accountReceiver.Balance, &accountReceiver.Currency, &accountReceiver.Date, &accountReceiver.Blocked)
+		err = results2.Scan(&accountReceiver.Id, &accountReceiver.Name, &accountReceiver.Account, &accountReceiver.Balance, &accountReceiver.Currency, &accountReceiver.Date, &accountReceiver.Blocked)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)

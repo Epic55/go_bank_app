@@ -1,23 +1,18 @@
 package models
 
-type Account struct {
+type User struct {
 	Id   int    `json:"Id"`
 	Name string `json:"name"`
-	//Account  int    `json:"account"`
+}
+
+type Account struct {
+	Id       int    `json:"Id"`
+	Name     string `json:"name"`
+	Account  string `json:"account"`
 	Balance  int    `json:"balance"`
 	Currency string `json:"currency"`
 	Date     string `json:"date"`
 	Blocked  bool   `json:"blocked"`
-}
-
-type Accountdata struct {
-	Id       int    `json:"Id"`
-	Name     string `json:"name"`
-	Account  int    `json:"account"`
-	Balance  int    `json:"balance"`
-	Currency string `json:"currency"`
-	//Date     string `json:"date"`
-	Blocked bool `json:"blocked"`
 }
 
 type History struct {
