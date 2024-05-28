@@ -6,13 +6,14 @@ type User struct {
 }
 
 type Account struct {
-	Id       int    `json:"Id"`
-	Name     string `json:"name"`
-	Account  string `json:"account"`
-	Balance  int    `json:"balance"`
-	Currency string `json:"currency"`
-	Date     string `json:"date"`
-	Blocked  bool   `json:"blocked"`
+	Id             int    `json:"Id,omitempty"`
+	Name           string `json:"name"`
+	Account        string `json:"account"`
+	Balance        int    `json:"balance"`
+	Currency       string `json:"currency"`
+	Date           string `json:"date"`
+	Blocked        bool   `json:"blocked"`
+	Defaultaccount bool   `json:"defaultaccount"`
 }
 
 type History struct {

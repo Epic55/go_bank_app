@@ -20,7 +20,7 @@ func (h handler) GetAllAccounts(w http.ResponseWriter, r *http.Request) {
 	var accounts = make([]models.Account, 0)
 	for results.Next() {
 		var account models.Account
-		err = results.Scan(&account.Id, &account.Name, &account.Account, &account.Balance, &account.Currency, &account.Date, &account.Blocked)
+		err = results.Scan(&account.Id, &account.Name, &account.Account, &account.Balance, &account.Currency, &account.Date, &account.Blocked, &account.Defaultaccount)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)

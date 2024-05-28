@@ -13,7 +13,7 @@ func (h handler) GetAccount(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
+	queryStmt := `SELECT name, account, balance, currency, date, blocked, defaultaccount FROM accounts WHERE name = $1 ;`
 	results, err := h.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
@@ -21,18 +21,31 @@ func (h handler) GetAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var account models.Account
+	var accounts = make([]models.Account, 0)
 	for results.Next() {
-		err = results.Scan(&account.Id, &account.Name, &account.Account, &account.Balance, &account.Currency, &account.Date, &account.Blocked)
-		//fmt.Println(results)
+		var account models.Account
+		err = results.Scan(&account.Name, &account.Account, &account.Balance, &account.Currency, &account.Date, &account.Blocked, &account.Defaultaccount)
 		if err != nil {
 			log.Println("failed to scan", err)
 			w.WriteHeader(500)
 			return
 		}
+
+		accounts = append(accounts, account)
 	}
+
+	// var account models.Account
+	// for results.Next() {
+	// 	err = results.Scan(&account.Id, &account.Name, &account.Account, &account.Balance, &account.Currency, &account.Date, &account.Blocked, &account.Defaultaccount)
+	// 	//fmt.Println(results)
+	// 	if err != nil {
+	// 		log.Println("failed to scan", err)
+	// 		w.WriteHeader(500)
+	// 		return
+	// 	}
+	// }
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(account)
+	json.NewEncoder(w).Encode(accounts)
 }

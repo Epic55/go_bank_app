@@ -1,9 +1,7 @@
 #WHAT NEED TO DO:
-- do several accounts for user
 - transfers btwn my accounts
 - convert/transfer to another account in another currency
 - history of transfers
-
 - authentication
 
 
@@ -14,6 +12,8 @@ DONE:
 - look history of operations
 - buy payments
 - history of payments
+- do several accounts for user
+- look all accounts for 1 user
 
 
 #API METHODS (OPERATIONS WITH ACCOUNT):
@@ -36,3 +36,12 @@ DONE:
   "Balance": 20,
   "Service": "tele2"
 }
+
+
+DO $$ DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+END $$;
