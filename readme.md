@@ -1,8 +1,8 @@
 #WHAT NEED TO DO:
-- transfers btwn my accounts
 - convert/transfer to another account in another currency
 - history of transfers
 - authentication
+- add grpc
 
 
 
@@ -14,6 +14,7 @@ DONE:
 - history of payments
 - do several accounts for user
 - look all accounts for 1 user
+- transfers btwn my accountss
 
 
 #API METHODS (OPERATIONS WITH ACCOUNT):
