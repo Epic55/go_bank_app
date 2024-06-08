@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/epic55/AccountRestApi/pkg/models"
@@ -67,7 +68,6 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 	if accountSender.Blocked == true || accountReceiver.Blocked == true {
 
 		fmt.Println("Operation is not permitted. Account is blocked -")
@@ -76,74 +76,225 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
 
 	} else {
+		if accountReceiver.Currency == "usd" && accountSender.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance*450 {
+			changesToAccountSender.Balance = changesToAccountSender.Balance * 450
+			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-		if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
-			if accountReceiver.Currency == "usd" && accountSender.Balance >= changesToAccountSender.Balance*450 {
-				changesToAccountSender.Balance = changesToAccountSender.Balance * 450
-			} else if accountReceiver.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance/450 {
-				changesToAccountSender.Balance = changesToAccountSender.Balance / 450
-			} else {
-				fmt.Println("Not enough money for convertation")
+				updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
+
+				queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
+				err = h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date1).Scan(&id)
+				fmt.Println("Sender account is withdrawed on", changesToAccountSender.Balance, "Result:", updatedBalanceSender)
+				if err != nil {
+					log.Println("failed to execute query - update accounts withdraw", err)
+					w.WriteHeader(500)
+					return
+				}
+
+				updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
+
+				queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
+				err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
+				fmt.Println("Receiver account is topped up on", changesToAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
+				if err != nil {
+					log.Println("failed to execute query - update accounts topup", err)
+					w.WriteHeader(500)
+					return
+				}
 
 				w.Header().Add("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				json.NewEncoder(w).Encode("Not enough money for convertation")
-			}
+				json.NewEncoder(w).Encode("Balances is updated on " + strconv.Itoa(changesToAccountReceiver.Balance) + ". Result: " + strconv.Itoa(updatedBalanceReceiver))
 
-			updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
-
-			queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
-			err = h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date1).Scan(&id)
-			fmt.Println("Sender account is withdrawed on", changesToAccountSender.Balance, "Result:", updatedBalanceSender)
-			if err != nil {
-				log.Println("failed to execute query - update accounts withdraw", err)
-				w.WriteHeader(500)
-				return
-			}
-
-			updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
-
-			queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
-			err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
-			fmt.Println("Receiver account is topped up on", changesToAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
-			if err != nil {
-				log.Println("failed to execute query - update accounts topup", err)
-				w.WriteHeader(500)
-				return
-			}
-
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Balances is updated")
-
-			typeofoperation := "transfer to "
-			queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-			_, err = h.DB.Exec(queryStmt3, accountSender.Name, date1, changesToAccountSender.Balance, accountSender.Currency, typeofoperation+accountReceiver.Name) //USE Exec FOR INSERT
-			if err != nil {
-				log.Println("failed to execute query - update history:", err)
-				return
+				typeofoperation := "transfer btwn my acccounts from "
+				typeofoperation2 := "transfer btwn my acccounts to "
+				UpdateHistory(typeofoperation,
+					typeofoperation2,
+					accountSender.Name,
+					accountSender.Currency,
+					accountSender.Account,
+					accountReceiver.Name,
+					accountReceiver.Currency,
+					accountReceiver.Account,
+					changesToAccountSender.Balance,
+					changesToAccountReceiver.Balance,
+					date1)
 			} else {
-				fmt.Println("History is updated")
+				NotEnoughMoney()
 			}
 
-			typeofoperation2 := "topup from user "
-			queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-			_, err = h.DB.Exec(queryStmt3, accountReceiver.Name, date1, changesToAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountSender.Name) //USE Exec FOR INSERT
-			if err != nil {
-				log.Println("failed to execute query - update history:", err)
-				return
+		} else if accountReceiver.Currency == "tg" && accountSender.Currency == "usd" && accountSender.Balance >= changesToAccountSender.Balance/450 && changesToAccountSender.Balance >= 450 {
+			changesToAccountSender.Balance = changesToAccountSender.Balance / 450
+			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
+
+				updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
+
+				queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
+				err = h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date1).Scan(&id)
+				fmt.Println("Sender account is withdrawed on", changesToAccountSender.Balance, "Result:", updatedBalanceSender)
+				if err != nil {
+					log.Println("failed to execute query - update accounts withdraw", err)
+					w.WriteHeader(500)
+					return
+				}
+
+				updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
+
+				queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
+				err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
+				fmt.Println("Receiver account is topped up on", changesToAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
+				if err != nil {
+					log.Println("failed to execute query - update accounts topup", err)
+					w.WriteHeader(500)
+					return
+				}
+
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode("Balances is updated on " + strconv.Itoa(changesToAccountReceiver.Balance) + ". Result: " + strconv.Itoa(updatedBalanceReceiver))
+
+				typeofoperation := "transfer btwn my acccounts from "
+				// queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+				// _, err = h.DB.Exec(queryStmt3, accountSender.Name, date1, changesToAccountSender.Balance, accountSender.Currency, typeofoperation+accountSender.Account) //USE Exec FOR INSERT
+				// if err != nil {
+				// 	log.Println("failed to execute query - update history sender:", err)
+				// 	return
+				// } else {
+				// 	fmt.Println("History is updated")
+				// }
+
+				typeofoperation2 := "transfer btwn my acccounts to "
+				// queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+				// _, err = h.DB.Exec(queryStmt3, accountReceiver.Name, date1, changesToAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountReceiver.Account) //USE Exec FOR INSERT
+				// if err != nil {
+				// 	log.Println("failed to execute query - update history receiver:", err)
+				// 	return
+				// } else {
+				// 	fmt.Println("History is updated")
+				// }
+
+				UpdateHistory(typeofoperation,
+					typeofoperation2,
+					accountSender.Name,
+					accountSender.Currency,
+					accountSender.Account,
+					accountReceiver.Name,
+					accountReceiver.Currency,
+					accountReceiver.Account,
+					changesToAccountSender.Balance,
+					changesToAccountReceiver.Balance,
+					date1)
 			} else {
-				fmt.Println("History is updated")
+				NotEnoughMoney()
 			}
+		} else if accountReceiver.Currency == "tg" && accountSender.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance {
 
+			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
+
+				updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
+
+				queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
+				err = h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date1).Scan(&id)
+				fmt.Println("Sender account is withdrawed on", changesToAccountSender.Balance, "Result:", updatedBalanceSender)
+				if err != nil {
+					log.Println("failed to execute query - update accounts withdraw", err)
+					w.WriteHeader(500)
+					return
+				}
+
+				updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
+
+				queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
+				err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
+				fmt.Println("Receiver account is topped up on", changesToAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
+				if err != nil {
+					log.Println("failed to execute query - update accounts topup", err)
+					w.WriteHeader(500)
+					return
+				}
+
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode("Balances is updated on " + strconv.Itoa(changesToAccountReceiver.Balance) + ". Result: " + strconv.Itoa(updatedBalanceReceiver))
+
+				typeofoperation := "transfer btwn my acccounts from "
+				// queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+				// _, err = h.DB.Exec(queryStmt3, accountSender.Name, date1, changesToAccountSender.Balance, accountSender.Currency, typeofoperation+accountSender.Account) //USE Exec FOR INSERT
+				// if err != nil {
+				// 	log.Println("failed to execute query - update history sender:", err)
+				// 	return
+				// } else {
+				// 	fmt.Println("History is updated")
+				// }
+
+				typeofoperation2 := "transfer btwn my acccounts to "
+				// queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+				// _, err = h.DB.Exec(queryStmt3, accountReceiver.Name, date1, changesToAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountReceiver.Account) //USE Exec FOR INSERT
+				// if err != nil {
+				// 	log.Println("failed to execute query - update history receiver:", err)
+				// 	return
+				// } else {
+				// 	fmt.Println("History is updated")
+				// }
+				UpdateHistory(typeofoperation,
+					typeofoperation2,
+					accountSender.Name,
+					accountSender.Currency,
+					accountSender.Account,
+					accountReceiver.Name,
+					accountReceiver.Currency,
+					accountReceiver.Account,
+					changesToAccountSender.Balance,
+					changesToAccountReceiver.Balance,
+					date1)
+
+			} else {
+				NotEnoughMoney()
+			}
 		} else {
-			fmt.Println("Not enough money")
+			fmt.Println("Not enough money for convertation")
 
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Not enough money")
+			json.NewEncoder(w).Encode("Not enough money for convertation")
 		}
+	}
+}
 
+func UpdateHistory(typeofoperation string,
+	typeofoperation2 string,
+	accountSender.Name string,
+	accountSender.Currency,
+	accountSender.Account,
+	accountReceiver.Name,
+	accountReceiver.Currency,
+	accountReceiver.Account,
+	changesToAccountSender.Balance,
+	changesToAccountReceiver.Balance,
+	date1 date) {
+	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+	_, err = h.DB.Exec(queryStmt3, accountSender.Name, date1, changesToAccountSender.Balance, accountSender.Currency, typeofoperation+accountSender.Account) //USE Exec FOR INSERT
+	if err != nil {
+		log.Println("failed to execute query - update history sender:", err)
+		return
+	} else {
+		fmt.Println("History is updated")
 	}
 
+	queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+	_, err = h.DB.Exec(queryStmt3, accountReceiver.Name, date1, changesToAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountReceiver.Account) //USE Exec FOR INSERT
+	if err != nil {
+		log.Println("failed to execute query - update history receiver:", err)
+		return
+	} else {
+		fmt.Println("History is updated")
+	}
+}
+
+func NotEnoughMoney() {
+	fmt.Println("Not enough money")
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Not enough money")
 }

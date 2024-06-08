@@ -126,7 +126,7 @@ func CreateTable(db *sql.DB) {
 	}
 
 	if !exists {
-		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, typeofoperation VARCHAR(30) NOT NULL);")
+		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, typeofoperation VARCHAR(50) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
