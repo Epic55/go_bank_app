@@ -52,7 +52,7 @@ func (h handler) Payments(w http.ResponseWriter, r *http.Request) {
 	services := []string{"tele2", "beeline", "kcell"}
 
 	if checkservice(services, changesToPayments.Service) {
-		if account.Blocked == false {
+		if !account.Blocked {
 
 			if account.Balance >= changesToAccount.Balance {
 				updatedBalance := account.Balance - changesToAccount.Balance
@@ -98,10 +98,7 @@ func (h handler) Payments(w http.ResponseWriter, r *http.Request) {
 			}
 
 		} else {
-			fmt.Println("Operation is not permitted. Account is blocked. Name -", account.Name, "ID -", account.Id)
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
+			AccountIsBlocked(w, account.Name, account.Id)
 		}
 
 	} else {

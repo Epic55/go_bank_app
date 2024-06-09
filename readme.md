@@ -1,9 +1,9 @@
 #WHAT NEED TO DO:
-
-- history of transfers
-- authentication
-- add grpc
 - use mutex to block accounts during withdraw
+- add grpc
+- authentication
+
+
 
 
 DONE:
@@ -16,6 +16,7 @@ DONE:
 - look all accounts for 1 user
 - transfers btwn my accountss
 - convert/transfer to another account in another currency
+- history of transfers
 
 
 #API METHODS (OPERATIONS WITH ACCOUNT):

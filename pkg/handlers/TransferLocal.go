@@ -68,7 +68,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if accountSender.Blocked == true || accountReceiver.Blocked == true {
+	if accountSender.Blocked || accountReceiver.Blocked {
 
 		fmt.Println("Operation is not permitted. Account is blocked -")
 		w.Header().Add("Content-Type", "application/json")

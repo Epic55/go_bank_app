@@ -46,32 +46,16 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	date1 := time.Now()
-	if account.Blocked == false {
+	if !account.Blocked {
 
 		if account.Balance >= changesToAccount.Balance {
 			updatedBalance := account.Balance - changesToAccount.Balance
 
-			queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
-			err = h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
-			fmt.Println("Balance is substracted on", changesToAccount.Balance, "Result:", updatedBalance)
-			if err != nil {
-				log.Println("failed to execute query", err)
-				w.WriteHeader(500)
-				return
-			}
+			typeofoperation2 := "withdrawed"
+			h.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
 
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Balances is updated")
-
-			queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-			_, err = h.DB.Exec(queryStmt3, account.Name, date1, changesToAccount.Balance, account.Currency, "withdraw") //USE Exec FOR INSERT
-			if err != nil {
-				log.Println("failed to execute query - update history:", err)
-				return
-			} else {
-				fmt.Println("History is updated")
-			}
+			typeofoperation := "withdraw"
+			h.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
 
 		} else {
 			fmt.Println("Not enough money")
@@ -82,10 +66,7 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		fmt.Println("Operation is not permitted. Account is blocked. Name -", account.Name, "ID -", account.Id)
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
+		AccountIsBlocked(w, account.Name, account.Id)
 	}
 
 }
