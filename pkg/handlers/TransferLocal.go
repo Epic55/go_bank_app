@@ -182,7 +182,6 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			fmt.Println("Not enough money for convertation")
-
 			w.Header().Add("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode("Not enough money for convertation")
@@ -264,7 +263,6 @@ func (h handler) UpdateHistory(typeofoperation,
 
 func NotEnoughMoney(w http.ResponseWriter) {
 	fmt.Println("Not enough money")
-
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Not enough money")

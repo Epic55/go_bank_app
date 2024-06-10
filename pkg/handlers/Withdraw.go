@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/epic55/AccountRestApi/pkg/models"
@@ -13,6 +13,8 @@ import (
 )
 
 func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
+	var m sync.Mutex
+
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -52,17 +54,15 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 			updatedBalance := account.Balance - changesToAccount.Balance
 
 			typeofoperation2 := "withdrawed"
+			m.Lock()
 			h.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
+			m.Unlock()
 
 			typeofoperation := "withdraw"
 			h.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
 
 		} else {
-			fmt.Println("Not enough money")
-
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Not enough money")
+			NotEnoughMoney(w)
 		}
 
 	} else {

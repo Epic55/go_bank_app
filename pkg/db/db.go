@@ -43,28 +43,31 @@ func CloseConnection(db *sql.DB) {
 }
 
 func CreateTable(db *sql.DB) {
-	var exists bool
-	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users' );").Scan(&exists); err != nil {
+	var exists1 bool
+	var exists2 bool
+	var exists3 bool
+	var exists4 bool
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users' );").Scan(&exists1); err != nil {
 		log.Println("failed to execute query", err)
 		return
 	}
 
-	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'history' );").Scan(&exists); err != nil {
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'accounts' );").Scan(&exists2); err != nil {
 		log.Println("failed to execute query", err)
 		return
 	}
 
-	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'payments' );").Scan(&exists); err != nil {
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'payments' );").Scan(&exists3); err != nil {
 		log.Println("failed to execute query", err)
 		return
 	}
 
-	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'accounts' );").Scan(&exists); err != nil {
+	if err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'history' );").Scan(&exists4); err != nil {
 		log.Println("failed to execute query", err)
 		return
 	}
 
-	if !exists {
+	if !exists1 {
 		_, err := db.Query("CREATE TABLE users (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
@@ -88,7 +91,7 @@ func CreateTable(db *sql.DB) {
 		log.Println("Table 'users' already exists ")
 	}
 
-	if !exists {
+	if !exists2 {
 		_, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, account VARCHAR(20) NOT NULL, balance int NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL, defaultaccount BOOLEAN NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
@@ -111,7 +114,7 @@ func CreateTable(db *sql.DB) {
 		log.Println("Table 'accounts' already exists ")
 	}
 
-	if !exists {
+	if !exists3 {
 		_, err := db.Query("CREATE TABLE payments (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, service VARCHAR(20) NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
@@ -125,7 +128,7 @@ func CreateTable(db *sql.DB) {
 		log.Println("Table 'payments' already exists ")
 	}
 
-	if !exists {
+	if !exists4 {
 		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, quantity int NOT NULL, currency VARCHAR(3) NOT NULL, typeofoperation VARCHAR(50) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)

@@ -126,11 +126,7 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 			}
 
 		} else {
-			fmt.Println("Not enough money")
-
-			w.Header().Add("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode("Not enough money")
+			NotEnoughMoney(w)
 		}
 
 	}
