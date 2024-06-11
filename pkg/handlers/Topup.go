@@ -61,7 +61,7 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToAccountBalance int, id, AccountCurrency, typeofoperation2 string, date1 time.Time) {
+func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToAccountBalance float64, id, AccountCurrency, typeofoperation2 string, date1 time.Time) {
 	queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
 	err := h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &AccountCurrency, date1).Scan(&id)
 	if err != nil {
@@ -74,13 +74,13 @@ func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToA
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Balance is " + string(typeofoperation2) + " on " + strconv.Itoa(changesToAccountBalance))
+	json.NewEncoder(w).Encode("Balance is " + string(typeofoperation2) + " on " + strconv.FormatFloat(changesToAccountBalance, 'f', 2, 64))
 }
 
 func (h handler) UpdateHistory2(typeofoperation,
 	accountName,
 	accountCurrency string,
-	changesToAccountBalance int,
+	changesToAccountBalance float64,
 	date time.Time) {
 	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
 	_, err := h.DB.Exec(queryStmt3, accountName, date, changesToAccountBalance, accountCurrency, typeofoperation) //USE Exec FOR INSERT

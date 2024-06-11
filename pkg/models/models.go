@@ -6,40 +6,39 @@ type User struct {
 }
 
 type Account struct {
-	Id             int    `json:"Id,omitempty"`
-	Name           string `json:"name"`
-	Account        string `json:"account"`
-	Balance        int    `json:"balance"`
-	Currency       string `json:"currency"`
-	Date           string `json:"date"`
-	Blocked        bool   `json:"blocked"`
-	Defaultaccount bool   `json:"defaultaccount"`
+	Id             int     `json:"Id,omitempty"`
+	Name           string  `json:"name"`
+	Account        string  `json:"account"`
+	Balance        float64 `json:"balance"`
+	Currency       string  `json:"currency"`
+	Date           string  `json:"date"`
+	Blocked        bool    `json:"blocked"`
+	Defaultaccount bool    `json:"defaultaccount"`
 }
 
 type History struct {
-	Id              int    `json:"Id,omitempty"`
-	Username        string `json:"username,omitempty"`
-	Date            string `json:"date"`
-	Quantity        int    `json:"quantity"`
-	Currency        string `json:"currency"`
-	Typeofoperation string `json:"typeofoperation"`
+	Id              int     `json:"Id,omitempty"`
+	Username        string  `json:"username,omitempty"`
+	Date            string  `json:"date"`
+	Quantity        float64 `json:"quantity"`
+	Currency        string  `json:"currency"`
+	Typeofoperation string  `json:"typeofoperation"`
 }
 
 type Payments struct {
-	Id       int    `json:"Id,omitempty"`
-	Username string `json:"username,omitempty"`
-	Date     string `json:"date"`
-	Service  string `json:"service"`
-	Quantity int    `json:"quantity"`
-	Currency string `json:"currency"`
+	Id       int     `json:"Id,omitempty"`
+	Username string  `json:"username,omitempty"`
+	Date     string  `json:"date"`
+	Service  string  `json:"service"`
+	Quantity float64 `json:"quantity"`
+	Currency string  `json:"currency"`
 }
 
 type Rate struct {
-	A_date string `xml:"date"`
-	Items  []Item `xml:"item"`
+	Items []Item `xml:"item"`
 }
 
 type Item struct {
-	Code  string `xml:"title"`
-	Value string `xml:"description"`
+	Code  string  `xml:"title"`
+	Value float64 `xml:"description"`
 }

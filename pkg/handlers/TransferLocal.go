@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +13,8 @@ import (
 	"github.com/epic55/AccountRestApi/pkg/models"
 	"github.com/gorilla/mux"
 )
+
+var ExchangeRate float64
 
 func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -68,6 +71,9 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	h.GetExchangeRate(w, r)
+
 	if accountSender.Blocked || accountReceiver.Blocked {
 
 		fmt.Println("Operation is not permitted. Account is blocked -")
@@ -76,8 +82,9 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
 
 	} else {
-		if accountReceiver.Currency == "usd" && accountSender.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance*450 {
-			changesToAccountSender.Balance = changesToAccountSender.Balance * 450
+		if accountReceiver.Currency == "usd" && accountSender.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance*ExchangeRate {
+			changesToAccountSender.Balance = changesToAccountSender.Balance * ExchangeRate
+
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
 				h.UpdateAccounts(w, id, id2,
@@ -111,8 +118,8 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				NotEnoughMoney(w)
 			}
 
-		} else if accountReceiver.Currency == "tg" && accountSender.Currency == "usd" && accountSender.Balance >= changesToAccountSender.Balance/450 && changesToAccountSender.Balance >= 450 {
-			changesToAccountSender.Balance = changesToAccountSender.Balance / 450
+		} else if accountReceiver.Currency == "tg" && accountSender.Currency == "usd" && accountSender.Balance >= changesToAccountSender.Balance/ExchangeRate && changesToAccountSender.Balance >= ExchangeRate {
+			changesToAccountSender.Balance = changesToAccountSender.Balance / ExchangeRate
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
 				h.UpdateAccounts(w, id, id2,
@@ -200,7 +207,7 @@ func (h handler) UpdateAccounts(w http.ResponseWriter,
 	accountReceiverBalance,
 	accountSenderBalance,
 	changesToAccountSenderBalance,
-	changesToAccountReceiverBalance int,
+	changesToAccountReceiverBalance float64,
 	date time.Time) {
 
 	updatedBalanceSender := accountSenderBalance - changesToAccountSenderBalance
@@ -227,7 +234,7 @@ func (h handler) UpdateAccounts(w http.ResponseWriter,
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Balances is updated on " + strconv.Itoa(changesToAccountReceiverBalance) + ". Result: " + strconv.Itoa(updatedBalanceReceiver))
+	json.NewEncoder(w).Encode("Balances is updated on " + strconv.FormatFloat(changesToAccountReceiverBalance, 'f', 2, 64) + ". Result: " + strconv.FormatFloat(updatedBalanceReceiver, 'f', 2, 64))
 }
 
 func (h handler) UpdateHistory(typeofoperation,
@@ -239,7 +246,7 @@ func (h handler) UpdateHistory(typeofoperation,
 	accountReceiverCurrency,
 	accountReceiverAccount string,
 	changesToAccountSenderBalance,
-	changesToAccountReceiverBalance int,
+	changesToAccountReceiverBalance float64,
 	date time.Time) {
 
 	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
@@ -266,4 +273,33 @@ func NotEnoughMoney(w http.ResponseWriter) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Not enough money")
+}
+
+func (h handler) GetExchangeRate(w http.ResponseWriter, r *http.Request) float64 {
+	date1 := time.Now()
+	date := date1.Format("02.01.2006")
+
+	response, err := http.Get("https://nationalbank.kz/rss/get_rates.cfm?fdate=" + date)
+	if err != nil {
+		log.Println("Error1 - ", err.Error())
+	}
+
+	responseData, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Println("Error2 - ", err)
+	}
+
+	var rate1 models.Rate
+	err = xml.Unmarshal([]byte(responseData), &rate1)
+	if err != nil {
+		log.Println("Error3 - ", err)
+	}
+
+	for _, item := range rate1.Items {
+		if item.Code == "USD" {
+			ExchangeRate = item.Value
+			fmt.Println("USD Exchange Rate is ", ExchangeRate)
+		}
+	}
+	return ExchangeRate
 }
