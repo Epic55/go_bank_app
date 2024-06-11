@@ -214,7 +214,7 @@ func (h handler) UpdateAccounts(w http.ResponseWriter,
 
 	queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
 	err := h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date).Scan(&id)
-	fmt.Println("Sender account is withdrawed on", changesToAccountSenderBalance, "Result:", updatedBalanceSender)
+	fmt.Printf("Sender account is withdrawed on %.2f Result: %.2f\n", changesToAccountSenderBalance, updatedBalanceSender)
 	if err != nil {
 		log.Println("failed to execute query - update accounts withdraw", err)
 		w.WriteHeader(500)
@@ -225,7 +225,7 @@ func (h handler) UpdateAccounts(w http.ResponseWriter,
 
 	queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
 	err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date).Scan(&id2)
-	fmt.Println("Receiver account is topped up on", changesToAccountReceiverBalance, "Result:", updatedBalanceReceiver)
+	fmt.Printf("Receiver account is topped up on %.2f Result: %.2f\n", changesToAccountReceiverBalance, updatedBalanceReceiver)
 	if err != nil {
 		log.Println("failed to execute query - update accounts topup", err)
 		w.WriteHeader(500)

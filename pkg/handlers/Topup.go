@@ -69,7 +69,7 @@ func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToA
 		w.WriteHeader(500)
 		return
 	} else {
-		fmt.Println("Balance is ", typeofoperation2, " on ", changesToAccountBalance, "Result: ", updatedBalance)
+		fmt.Printf("Balance is %s on %.2f Result: %.2f\n", typeofoperation2, changesToAccountBalance, updatedBalance)
 	}
 
 	w.Header().Add("Content-Type", "application/json")

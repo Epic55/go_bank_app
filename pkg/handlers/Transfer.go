@@ -47,8 +47,8 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//RECEIVER USER
-	var changesToAccountAccountReceiver models.Account
-	json.Unmarshal(body, &changesToAccountAccountReceiver)
+	var changesToAccountReceiver models.Account
+	json.Unmarshal(body, &changesToAccountReceiver)
 
 	queryStmt3 := `SELECT * FROM accounts WHERE id = $1 ;`
 	results2, err := h.DB.Query(queryStmt3, id2)
@@ -83,18 +83,18 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 
 			queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE id = $1 RETURNING id;`
 			err = h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date1).Scan(&id)
-			fmt.Println("Sender balance is withdrawed on", changesToAccountSender.Balance, "Result:", updatedBalanceSender)
+			fmt.Printf("Sender Balance is withdrawed on %.2f Result: %.2f\n", changesToAccountSender.Balance, updatedBalanceSender)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				w.WriteHeader(500)
 				return
 			}
 
-			updatedBalanceReceiver := accountReceiver.Balance + changesToAccountAccountReceiver.Balance
+			updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
 
 			queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE id = $1 RETURNING id;`
 			err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
-			fmt.Println("Receiver balance is topped up on", changesToAccountAccountReceiver.Balance, "Result:", updatedBalanceReceiver)
+			fmt.Printf("Receiver Balance is topped on %.2f Result: %.2f\n", changesToAccountReceiver.Balance, updatedBalanceReceiver)
 			if err != nil {
 				log.Println("failed to execute query", err)
 				w.WriteHeader(500)
@@ -117,7 +117,7 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 
 			typeofoperation2 := "topup from user "
 			queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-			_, err = h.DB.Exec(queryStmt3, accountReceiver.Name, date1, changesToAccountAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountSender.Name) //USE Exec FOR INSERT
+			_, err = h.DB.Exec(queryStmt3, accountReceiver.Name, date1, changesToAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountSender.Name) //USE Exec FOR INSERT
 			if err != nil {
 				log.Println("failed to execute query - update history:", err)
 				return
