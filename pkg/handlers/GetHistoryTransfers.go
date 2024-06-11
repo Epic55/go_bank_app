@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/AccountRestApi/pkg/models"
+	"github.com/epic55/BankApp/pkg/models"
 	"github.com/gorilla/mux"
 )
 

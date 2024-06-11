@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/epic55/AccountRestApi/pkg/mocks"
+	"github.com/epic55/BankApp/pkg/mocks"
 	_ "github.com/lib/pq"
 )
 

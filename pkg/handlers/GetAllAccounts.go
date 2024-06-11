@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/AccountRestApi/pkg/models"
+	"github.com/epic55/BankApp/pkg/models"
 )
 
 func (h handler) GetAllAccounts(w http.ResponseWriter, r *http.Request) {

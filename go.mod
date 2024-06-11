@@ -1,4 +1,4 @@
-module github.com/epic55/AccountRestApi
+module github.com/epic55/BankApp
 
 go 1.17
 

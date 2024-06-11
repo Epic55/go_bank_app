@@ -6,14 +6,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/AccountRestApi/pkg/db"
-	"github.com/epic55/AccountRestApi/pkg/handlers"
+	"github.com/epic55/BankApp/pkg/db"
+	"github.com/epic55/BankApp/pkg/handlers"
 	"github.com/gorilla/mux"
 )
 
 func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the account REST API!")
-	fmt.Println("Account REST API")
+	fmt.Fprintf(w, "Welcome to the Bank REST API!")
+	fmt.Println("Bank REST API")
 }
 
 func handleRequests(DB *sql.DB) {
@@ -33,7 +33,6 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/accounts/transferlocal/{account1}/{account2}", h.TransferLocal).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/blocking/{id}", h.BlockAccount).Methods(http.MethodPut)
 	myRouter.HandleFunc("/payments/{id}", h.Payments).Methods(http.MethodPut)
-	//myRouter.HandleFunc("/er", h.GetExchangeRate).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe("localhost:8080", myRouter))
 	fmt.Println("Listening in port 8080")
