@@ -1,5 +1,4 @@
 #WHAT NEED TO DO:
-- use context
 - authentication
 
 
