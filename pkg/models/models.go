@@ -35,6 +35,11 @@ type Payments struct {
 }
 
 type Rate struct {
-	Title string  `xml:"title"`
-	Rate  float64 `xml:"description"`
+	A_date string `xml:"date"`
+	Items  []Item `xml:"item"`
+}
+
+type Item struct {
+	Code  string `xml:"title"`
+	Value string `xml:"description"`
 }
