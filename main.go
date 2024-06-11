@@ -33,6 +33,7 @@ func handleRequests(DB *sql.DB) {
 	myRouter.HandleFunc("/accounts/transferlocal/{account1}/{account2}", h.TransferLocal).Methods(http.MethodPut)
 	myRouter.HandleFunc("/accounts/blocking/{id}", h.BlockAccount).Methods(http.MethodPut)
 	myRouter.HandleFunc("/payments/{id}", h.Payments).Methods(http.MethodPut)
+	myRouter.HandleFunc("/er", h.GetExchangeRate).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe("localhost:8080", myRouter))
 	fmt.Println("Listening in port 8080")

@@ -31,18 +31,6 @@ func (h handler) GetExchangeRate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("Error - ", err)
 	}
-
-	// Create a new RateModel instance
-	ratemodel1 := models.RateModel{
-		A_date: rate1.A_date,
-	}
-
-	// Convert and save items
-	for _, i := range rate1.Items {
-		ratemodel1.Item = append(ratemodel1.Item, models.R_CURRENCY{
-			Title: i.Title,
-			Value: i.Value,
-		})
-	}
+	fmt.Println(rate1)
 
 }
