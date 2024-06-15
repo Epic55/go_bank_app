@@ -1,23 +1,3 @@
-#WHAT NEED TO DO:
-- authentication
-
-
-
-
-DONE:
-- add currency of balance
-- block account
-- look history of operations
-- buy payments
-- history of payments
-- do several accounts for user
-- look all accounts for 1 user
-- transfers btwn my accountss
-- convert/transfer to another account in another currency with downloading actual exchange rate
-- history of transfers
-- use mutex to block accounts during withdraw
-
-
 #API METHODS (OPERATIONS WITH ACCOUNT):
 1) LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
 2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
