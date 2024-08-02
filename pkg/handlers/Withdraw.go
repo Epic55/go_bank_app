@@ -47,7 +47,8 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	date1 := time.Now()
+	date := time.Now()
+	date1 := date.Format("2006-01-02 15:04:05")
 	if !account.Blocked {
 
 		if account.Balance >= changesToAccount.Balance {

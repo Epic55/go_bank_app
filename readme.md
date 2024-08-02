@@ -1,6 +1,14 @@
 PLAN TO DO:
 1) SEND BY PHONE 
-2) SEND BY CARD - Implement the Luhn algorithm. Create an HTTP server. Configure the server to respond to GET requests having a JSON payload.     Accept valid JSON requests and proceed to step 5, whilst rejecting invalid requests using an HTTP 400 status code. Extract the credit card number from the JSON payload. Run the Luhn algorithm on the number. Wrap the result into a JSON response payload. Return the payload back to the user through the HTTP server.
+2) SEND BY CARD - 
+Implement the Luhn algorithm. 
+Create an HTTP server. 
+Configure the server to respond to GET requests having a JSON payload.
+Accept valid JSON requests and proceed to step 5, whilst rejecting invalid requests using an HTTP 400 status code. 
+Extract the credit card number from the JSON payload. 
+Run the Luhn algorithm on the number. 
+Wrap the result into a JSON response payload. 
+Return the payload back to the user through the HTTP server.
 3) SAVE VYPISKA TO A FILE (FOR WEEK, MONTH, YEAR)
 4) OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT). IMPLEMENT PRODUCTS BY USING INTERFACE WITH DIFFERENT STRUCTS.
 5) SEND NOFITICATION TO EMAIL

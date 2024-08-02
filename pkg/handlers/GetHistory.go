@@ -13,7 +13,7 @@ func (h handler) GetHistory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["username"]
 
-	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1;`
+	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 ORDER BY date DESC;`
 	results, err := h.DB.Query(queryStmt, id)
 	//fmt.Println(results)
 	if err != nil {

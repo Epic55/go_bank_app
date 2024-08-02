@@ -92,7 +92,7 @@ func CreateTable(db *sql.DB) {
 	}
 
 	if !exists2 {
-		_, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, account VARCHAR(20) NOT NULL, balance NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL, date timestamp NOT NULL, blocked BOOLEAN NOT NULL, defaultaccount BOOLEAN NOT NULL);")
+		_, err := db.Query("CREATE TABLE accounts (id serial PRIMARY KEY, name VARCHAR(20) NOT NULL, account VARCHAR(20) NOT NULL, balance NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL, date VARCHAR(30) NOT NULL, blocked BOOLEAN NOT NULL, defaultaccount BOOLEAN NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
@@ -102,7 +102,8 @@ func CreateTable(db *sql.DB) {
 
 		for _, account := range mocks.Accounts {
 			queryStmt := `INSERT INTO accounts (name,account,balance,currency,date,blocked,defaultaccount) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`
-			date1 := time.Now()
+			date := time.Now()
+			date1 := date.Format("2006-01-02 15:04:05")
 			err := db.QueryRow(queryStmt, &account.Name, &account.Account, &account.Balance, &account.Currency, date1, &account.Blocked, &account.Defaultaccount).Scan(&account.Id)
 			if err != nil {
 				log.Println("failed to execute query", err)
@@ -115,7 +116,7 @@ func CreateTable(db *sql.DB) {
 	}
 
 	if !exists3 {
-		_, err := db.Query("CREATE TABLE payments (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, service VARCHAR(20) NOT NULL, quantity NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL);")
+		_, err := db.Query("CREATE TABLE payments (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date VARCHAR(20) NOT NULL, service VARCHAR(20) NOT NULL, quantity NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
@@ -129,7 +130,7 @@ func CreateTable(db *sql.DB) {
 	}
 
 	if !exists4 {
-		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date timestamp NOT NULL, quantity NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL, typeofoperation VARCHAR(50) NOT NULL);")
+		_, err := db.Query("CREATE TABLE history (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date VARCHAR(20) NOT NULL, quantity NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL, typeofoperation VARCHAR(50) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return

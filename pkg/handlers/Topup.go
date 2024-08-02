@@ -16,7 +16,8 @@ import (
 func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	date1 := time.Now()
+	date := time.Now()
+	date1 := date.Format("2006-01-02 15:04:05")
 
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
@@ -61,7 +62,7 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToAccountBalance float64, id, AccountCurrency, typeofoperation2 string, date1 time.Time) {
+func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToAccountBalance float64, id, AccountCurrency, typeofoperation2 string, date1 string) {
 	queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
 	err := h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &AccountCurrency, date1).Scan(&id)
 	if err != nil {
@@ -81,7 +82,7 @@ func (h handler) UpdateHistory2(typeofoperation,
 	accountName,
 	accountCurrency string,
 	changesToAccountBalance float64,
-	date time.Time) {
+	date string) {
 	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
 	_, err := h.DB.Exec(queryStmt3, accountName, date, changesToAccountBalance, accountCurrency, typeofoperation) //USE Exec FOR INSERT
 	if err != nil {

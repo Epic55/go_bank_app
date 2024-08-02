@@ -23,7 +23,8 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	date1 := time.Now()
+	date := time.Now()
+	date1 := date.Format("2006-01-02 15:04:05")
 
 	var changesToAccountSender models.Account
 	json.Unmarshal(body, &changesToAccountSender)

@@ -27,7 +27,8 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	date1 := time.Now()
+	date := time.Now()
+	date1 := date.Format("2006-01-02 15:04:05")
 
 	var changesToAccountSender models.Account
 	json.Unmarshal(body, &changesToAccountSender)
@@ -208,7 +209,7 @@ func (h handler) UpdateAccounts(w http.ResponseWriter,
 	accountSenderBalance,
 	changesToAccountSenderBalance,
 	changesToAccountReceiverBalance float64,
-	date time.Time) {
+	date string) {
 
 	updatedBalanceSender := accountSenderBalance - changesToAccountSenderBalance
 
@@ -247,7 +248,7 @@ func (h handler) UpdateHistory(typeofoperation,
 	accountReceiverAccount string,
 	changesToAccountSenderBalance,
 	changesToAccountReceiverBalance float64,
-	date time.Time) {
+	date string) {
 
 	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
 	_, err := h.DB.Exec(queryStmt3, accountSenderName, date, changesToAccountSenderBalance, accountSenderCurrency, typeofoperation+accountSenderAccount) //USE Exec FOR INSERT
