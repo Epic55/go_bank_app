@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"strings"
 
 	"github.com/epic55/BankApp/pkg/models"
 	"github.com/gorilla/mux"
@@ -48,17 +48,18 @@ func (h handler) GetStatement(w http.ResponseWriter, r *http.Request) {
 		history2 = append(history2, history)
 	}
 
+	// jsonData, err := json.Marshal(history2)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	// Write the data to the file
-	err = os.WriteFile(filePath, []byte(string(history2)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = os.WriteFile(filePath, jsonData, 0644)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	log.Println("Data successfully saved to", filePath)
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Statement saved to a file")
+	//log.Println("Data successfully saved to", filePath)
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
@@ -69,25 +70,36 @@ func (h handler) GetStatement(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Open the file
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer file.Close()
+	// file, err := os.Open(filePath)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// defer file.Close()
 
-	// Get the file size
-	fileInfo, err := file.Stat()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fileSize := fileInfo.Size()
+	// // Get the file size
+	// fileInfo, err := file.Stat()
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// fileSize := fileInfo.Size()
+
+	reader := strings.NewReader(history2)
+	contentSize := int64(len(history2))
 
 	// Upload the file
-	_, err = minioClient.PutObject(context.Background(), bucketName, objectName, file, fileSize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = minioClient.PutObject(context.Background(), bucketName, objectName, reader, contentSize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// _, err = minioClient.PutObject(context.Background(), bucketName, objectName, file, fileSize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
 	fmt.Printf("Successfully uploaded %s to %s\n", objectName, bucketName)
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Statement saved to a file")
 
 }
