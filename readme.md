@@ -9,7 +9,6 @@ Extract the credit card number from the JSON payload.
 Run the Luhn algorithm on the number. 
 Wrap the result into a JSON response payload. 
 Return the payload back to the user through the HTTP server.
-3) SAVE VYPISKA TO A FILE (FOR WEEK, MONTH, YEAR)
 4) OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT). IMPLEMENT PRODUCTS BY USING INTERFACE WITH DIFFERENT STRUCTS.
 5) SEND NOFITICATION TO EMAIL
 6) IMPLEMENT LIMITS BY CARD
@@ -35,6 +34,7 @@ Return the payload back to the user through the HTTP server.
 10) PAYMENTS - PUT - localhost:8080/payments/ID
 11) LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
 12) LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
+13) SAVE STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
 
 #JSON BODY FOR API METHODS:
 {
