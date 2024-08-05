@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/BankApp/pkg/db"
-	"github.com/epic55/BankApp/pkg/handlers"
+	"github.com/epic55/BankApp/internal/db"
+	"github.com/epic55/BankApp/internal/repository"
 	"github.com/gorilla/mux"
 )
 
@@ -17,7 +17,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleRequests(DB *sql.DB) {
-	h := handlers.New(DB)
+	h := repository.New(DB)
 	// create a new instance of a mux router
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)

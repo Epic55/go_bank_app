@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -24,12 +24,12 @@ const (
 	filePath        = "C:\\Users\\alibe\\Desktop\\statement.txt" // Path to the file you want to upload
 )
 
-func (h handler) GetStatement(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetStatement(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["username"]
 
 	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 ORDER BY date DESC;`
-	results, err := h.DB.Query(queryStmt, id)
+	results, err := h.R.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query - get history", err)
 		w.WriteHeader(500)

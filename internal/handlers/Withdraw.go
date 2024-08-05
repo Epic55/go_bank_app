@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 )
 
-func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	var m sync.Mutex
 
 	vars := mux.Vars(r)
@@ -30,7 +30,7 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.DB.Query(queryStmt, id)
+	results, err := h.R.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -56,11 +56,11 @@ func (h handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 
 			typeofoperation2 := "withdrawed"
 			m.Lock()
-			h.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
+			h.R.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
 			m.Unlock()
 
 			typeofoperation := "withdraw"
-			h.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
+			h.R.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
 
 		} else {
 			NotEnoughMoney(w)

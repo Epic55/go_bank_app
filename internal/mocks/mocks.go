@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/epic55/BankApp/pkg/models"
+import "github.com/epic55/BankApp/internal/models"
 
 var Users = []models.User{
 	{Id: 1, Name: "Epic"},

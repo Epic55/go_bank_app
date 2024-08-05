@@ -7,11 +7,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
+	"github.com/epic55/BankApp/internal/repository"
 	"github.com/gorilla/mux"
 )
 
-func (h handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+	R *repository.Repository
+}
+
+func (h *Handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -27,7 +32,7 @@ func (h handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.DB.Query(queryStmt, id)
+	results, err := h.R.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -45,7 +50,7 @@ func (h handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	queryStmt2 := `UPDATE accounts SET blocked = $2 WHERE id = $1 RETURNING id;`
-	err = h.DB.QueryRow(queryStmt2, &id, &changesToAccount.Blocked).Scan(&id)
+	err = h.R.DB.QueryRow(queryStmt2, &id, &changesToAccount.Blocked).Scan(&id)
 	fmt.Println("Blocking status is changed on ", changesToAccount.Blocked)
 	if err != nil {
 		log.Println("failed to execute query", err)

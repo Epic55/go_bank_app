@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 )
 
-func (h handler) GetAllAccounts(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetAllAccounts(w http.ResponseWriter, r *http.Request) {
 
-	results, err := h.DB.Query("SELECT * FROM accounts;")
+	results, err := h.R.DB.Query("SELECT * FROM accounts;")
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)

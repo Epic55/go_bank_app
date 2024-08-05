@@ -6,14 +6,13 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 )
 
-func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Topup(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	date := time.Now()
@@ -29,7 +28,7 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.DB.Query(queryStmt, id)
+	results, err := h.R.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -52,44 +51,13 @@ func (h handler) Topup(w http.ResponseWriter, r *http.Request) {
 		updatedBalance := account.Balance + changesToAccount.Balance
 
 		typeofoperation2 := "topuped"
-		h.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
+		h.R.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
 
 		typeofoperation := "topup"
-		h.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
+		h.R.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
 
 	} else {
 		AccountIsBlocked(w, account.Name, account.Id)
-	}
-}
-
-func (h handler) UpdateAccount(w http.ResponseWriter, updatedBalance, changesToAccountBalance float64, id, AccountCurrency, typeofoperation2 string, date1 string) {
-	queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
-	err := h.DB.QueryRow(queryStmt2, &id, &updatedBalance, &AccountCurrency, date1).Scan(&id)
-	if err != nil {
-		log.Println("failed to execute query:", err)
-		w.WriteHeader(500)
-		return
-	} else {
-		fmt.Printf("Balance is %s on %.2f Result: %.2f\n", typeofoperation2, changesToAccountBalance, updatedBalance)
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Balance is " + string(typeofoperation2) + " on " + strconv.FormatFloat(changesToAccountBalance, 'f', 2, 64))
-}
-
-func (h handler) UpdateHistory2(typeofoperation,
-	accountName,
-	accountCurrency string,
-	changesToAccountBalance float64,
-	date string) {
-	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-	_, err := h.DB.Exec(queryStmt3, accountName, date, changesToAccountBalance, accountCurrency, typeofoperation) //USE Exec FOR INSERT
-	if err != nil {
-		log.Println("failed to execute query - update history:", err)
-		return
-	} else {
-		fmt.Println("History is updated")
 	}
 }
 
@@ -100,7 +68,7 @@ func AccountIsBlocked(w http.ResponseWriter, accountName string, accountId int) 
 	json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
 }
 
-// func (h handler) GetInfoAboutAccount(w http.ResponseWriter, accountId, accountName, accountAccount, accountCurrency, accountDate string, accountBalance int, accountBlocked, accountDefaultaccount bool) Account {
+// func (h repository.Handler) GetInfoAboutAccount(w http.ResponseWriter, accountId, accountName, accountAccount, accountCurrency, accountDate string, accountBalance int, accountBlocked, accountDefaultaccount bool) Account {
 // 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
 // 	results, err := h.DB.Query(queryStmt, accountId)
 // 	if err != nil {

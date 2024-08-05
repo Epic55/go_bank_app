@@ -5,16 +5,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 )
 
-func (h handler) GetAccount(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetAccount(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
 	queryStmt := `SELECT name, account, balance, currency, date, blocked, defaultaccount FROM accounts WHERE name = $1 ;`
-	results, err := h.DB.Query(queryStmt, id)
+	results, err := h.R.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)

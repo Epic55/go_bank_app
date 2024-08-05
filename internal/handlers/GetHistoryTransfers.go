@@ -5,16 +5,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 )
 
-func (h handler) GetHistory(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetHistoryTransfers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["username"]
 
-	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 ORDER BY date DESC;`
-	results, err := h.DB.Query(queryStmt, id)
+	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 AND typeofoperation LIKE '%transfer%';`
+	results, err := h.R.DB.Query(queryStmt, id)
 	//fmt.Println(results)
 	if err != nil {
 		log.Println("failed to execute query - get history", err)

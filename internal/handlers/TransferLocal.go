@@ -7,16 +7,15 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/epic55/BankApp/pkg/models"
+	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 )
 
 var ExchangeRate float64
 
-func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["account1"]
 	id2 := vars["account2"]
@@ -34,7 +33,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccountSender)
 
 	queryStmt := `SELECT * FROM accounts WHERE account = $1 ;`
-	results, err := h.DB.Query(queryStmt, id)
+	results, err := h.R.DB.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query 1", err)
 		w.WriteHeader(500)
@@ -56,7 +55,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccountReceiver)
 
 	queryStmt3 := `SELECT * FROM accounts WHERE account = $1 ;`
-	results2, err := h.DB.Query(queryStmt3, id2)
+	results2, err := h.R.DB.Query(queryStmt3, id2)
 	if err != nil {
 		log.Println("failed to execute query 2", err)
 		w.WriteHeader(500)
@@ -73,7 +72,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	h.GetExchangeRate(w, r)
+	GetExchangeRate(w, r)
 
 	if accountSender.Blocked || accountReceiver.Blocked {
 
@@ -88,7 +87,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-				h.UpdateAccounts(w, id, id2,
+				h.R.UpdateAccounts(w, id, id2,
 					accountSender.Name,
 					accountSender.Currency,
 					accountSender.Account,
@@ -104,7 +103,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.UpdateHistory(typeofoperation,
+				h.R.UpdateHistory(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -123,7 +122,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 			changesToAccountSender.Balance = changesToAccountSender.Balance / ExchangeRate
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-				h.UpdateAccounts(w, id, id2,
+				h.R.UpdateAccounts(w, id, id2,
 					accountSender.Name,
 					accountSender.Currency,
 					accountSender.Account,
@@ -139,7 +138,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.UpdateHistory(typeofoperation,
+				h.R.UpdateHistory(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -157,7 +156,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-				h.UpdateAccounts(w, id, id2,
+				h.R.UpdateAccounts(w, id, id2,
 					accountSender.Name,
 					accountSender.Currency,
 					accountSender.Account,
@@ -173,7 +172,7 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.UpdateHistory(typeofoperation,
+				h.R.UpdateHistory(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -197,78 +196,6 @@ func (h handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h handler) UpdateAccounts(w http.ResponseWriter,
-	id, id2,
-	accountSenderName,
-	accountSenderCurrency,
-	accountSenderAccount,
-	accountReceiverName,
-	accountReceiverCurrency,
-	accountReceiverAccount string,
-	accountReceiverBalance,
-	accountSenderBalance,
-	changesToAccountSenderBalance,
-	changesToAccountReceiverBalance float64,
-	date string) {
-
-	updatedBalanceSender := accountSenderBalance - changesToAccountSenderBalance
-
-	queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
-	err := h.DB.QueryRow(queryStmt2, &id, &updatedBalanceSender, date).Scan(&id)
-	fmt.Printf("Sender account is withdrawed on %.2f Result: %.2f\n", changesToAccountSenderBalance, updatedBalanceSender)
-	if err != nil {
-		log.Println("failed to execute query - update accounts withdraw", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	updatedBalanceReceiver := accountReceiverBalance + changesToAccountReceiverBalance
-
-	queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
-	err = h.DB.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date).Scan(&id2)
-	fmt.Printf("Receiver account is topped up on %.2f Result: %.2f\n", changesToAccountReceiverBalance, updatedBalanceReceiver)
-	if err != nil {
-		log.Println("failed to execute query - update accounts topup", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Balances is updated on " + strconv.FormatFloat(changesToAccountReceiverBalance, 'f', 2, 64) + ". Result: " + strconv.FormatFloat(updatedBalanceReceiver, 'f', 2, 64))
-}
-
-func (h handler) UpdateHistory(typeofoperation,
-	typeofoperation2,
-	accountSenderName,
-	accountSenderCurrency,
-	accountSenderAccount,
-	accountReceiverName,
-	accountReceiverCurrency,
-	accountReceiverAccount string,
-	changesToAccountSenderBalance,
-	changesToAccountReceiverBalance float64,
-	date string) {
-
-	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-	_, err := h.DB.Exec(queryStmt3, accountSenderName, date, changesToAccountSenderBalance, accountSenderCurrency, typeofoperation+accountSenderAccount) //USE Exec FOR INSERT
-	if err != nil {
-		log.Println("failed to execute query - update history sender:", err)
-		return
-	} else {
-		fmt.Println("History is updated")
-	}
-
-	queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-	_, err = h.DB.Exec(queryStmt3, accountReceiverName, date, changesToAccountReceiverBalance, accountReceiverCurrency, typeofoperation2+accountReceiverAccount) //USE Exec FOR INSERT
-	if err != nil {
-		log.Println("failed to execute query - update history receiver:", err)
-		return
-	} else {
-		fmt.Println("History is updated")
-	}
-}
-
 func NotEnoughMoney(w http.ResponseWriter) {
 	fmt.Println("Not enough money")
 	w.Header().Add("Content-Type", "application/json")
@@ -276,7 +203,7 @@ func NotEnoughMoney(w http.ResponseWriter) {
 	json.NewEncoder(w).Encode("Not enough money")
 }
 
-func (h handler) GetExchangeRate(w http.ResponseWriter, r *http.Request) float64 {
+func GetExchangeRate(w http.ResponseWriter, r *http.Request) float64 {
 	date1 := time.Now()
 	date := date1.Format("02.01.2006")
 
