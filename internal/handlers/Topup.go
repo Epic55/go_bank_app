@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h *Handler) Topup(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Topup(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	date := time.Now()
@@ -28,7 +29,7 @@ func (h *Handler) Topup(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -54,7 +55,7 @@ func (h *Handler) Topup(w http.ResponseWriter, r *http.Request) {
 		h.R.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
 
 		typeofoperation := "topup"
-		h.R.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
+		h.R.UpdateHistory(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
 
 	} else {
 		AccountIsBlocked(w, account.Name, account.Id)
@@ -67,23 +68,3 @@ func AccountIsBlocked(w http.ResponseWriter, accountName string, accountId int) 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
 }
-
-// func (h repository.Handler) GetInfoAboutAccount(w http.ResponseWriter, accountId, accountName, accountAccount, accountCurrency, accountDate string, accountBalance int, accountBlocked, accountDefaultaccount bool) Account {
-// 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-// 	results, err := h.DB.Query(queryStmt, accountId)
-// 	if err != nil {
-// 		log.Println("failed to execute query", err)
-// 		w.WriteHeader(500)
-// 		return err
-// 	}
-
-// 	for results.Next() {
-// 		err = results.Scan(&accountId, &accountName, &accountAccount, &accountBalance, &accountCurrency, &accountDate, &accountBlocked, &accountDefaultaccount)
-// 		if err != nil {
-// 			log.Println("failed to scan", err)
-// 			w.WriteHeader(500)
-// 			return err
-// 		}
-// 	}
-// 	return Account{Name: accountName, Account: accountAccount, Balance: accountBalance, Currency: accountCurrency, Date: accountDate, Blocked: accountBlocked}
-// }

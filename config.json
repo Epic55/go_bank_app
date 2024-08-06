@@ -1,0 +1,4 @@
+{
+  "listenPort": "8080",
+  "ConnectionString": "postgres:1@localhost:5432/postgres"
+}

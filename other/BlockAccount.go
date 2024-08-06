@@ -8,13 +8,8 @@ import (
 	"net/http"
 
 	"github.com/epic55/BankApp/internal/models"
-	"github.com/epic55/BankApp/internal/repository"
 	"github.com/gorilla/mux"
 )
-
-type Handler struct {
-	R *repository.Repository
-}
 
 func (h *Handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
