@@ -24,12 +24,12 @@ const (
 	filePath        = "C:\\Users\\alibe\\Desktop\\statement.txt" // Path to the file you want to upload
 )
 
-func (h *Handler) GetStatement(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetStatement(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
 	id := vars["username"]
 
 	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 ORDER BY date DESC;`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query - get history", err)
 		w.WriteHeader(500)

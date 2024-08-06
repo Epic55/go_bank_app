@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,12 +10,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h *Handler) GetHistoryTransfers(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetHistoryTransfers(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
 	id := vars["username"]
 
 	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 AND typeofoperation LIKE '%transfer%';`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	//fmt.Println(results)
 	if err != nil {
 		log.Println("failed to execute query - get history", err)

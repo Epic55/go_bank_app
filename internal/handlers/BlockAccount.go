@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h *Handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) BlockAccount(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -27,7 +28,7 @@ func (h *Handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -45,7 +46,7 @@ func (h *Handler) BlockAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	queryStmt2 := `UPDATE accounts SET blocked = $2 WHERE id = $1 RETURNING id;`
-	err = h.R.DB.QueryRow(queryStmt2, &id, &changesToAccount.Blocked).Scan(&id)
+	err = h.R.Db.QueryRow(queryStmt2, &id, &changesToAccount.Blocked).Scan(&id)
 	fmt.Println("Blocking status is changed on ", changesToAccount.Blocked)
 	if err != nil {
 		log.Println("failed to execute query", err)

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -15,7 +16,7 @@ import (
 
 var ExchangeRate float64
 
-func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
 	id := vars["account1"]
 	id2 := vars["account2"]
@@ -33,7 +34,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccountSender)
 
 	queryStmt := `SELECT * FROM accounts WHERE account = $1 ;`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query 1", err)
 		w.WriteHeader(500)
@@ -55,7 +56,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccountReceiver)
 
 	queryStmt3 := `SELECT * FROM accounts WHERE account = $1 ;`
-	results2, err := h.R.DB.Query(queryStmt3, id2)
+	results2, err := h.R.Db.Query(queryStmt3, id2)
 	if err != nil {
 		log.Println("failed to execute query 2", err)
 		w.WriteHeader(500)
@@ -103,7 +104,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.R.UpdateHistory(typeofoperation,
+				h.R.UpdateHistory2(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -138,7 +139,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.R.UpdateHistory(typeofoperation,
+				h.R.UpdateHistory2(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -172,7 +173,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request) {
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.R.UpdateHistory(typeofoperation,
+				h.R.UpdateHistory2(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,

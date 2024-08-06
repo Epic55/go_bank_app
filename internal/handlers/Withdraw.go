@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -12,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	var m sync.Mutex
 
 	vars := mux.Vars(r)
@@ -30,7 +31,7 @@ func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToAccount)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -60,7 +61,7 @@ func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 			m.Unlock()
 
 			typeofoperation := "withdraw"
-			h.R.UpdateHistory2(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
+			h.R.UpdateHistory(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
 
 		} else {
 			NotEnoughMoney(w)

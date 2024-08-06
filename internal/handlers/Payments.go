@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (h *Handler) Payments(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Payments(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
@@ -30,7 +31,7 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &changesToPayments)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
-	results, err := h.R.DB.Query(queryStmt, id)
+	results, err := h.R.Db.Query(queryStmt, id)
 	if err != nil {
 		log.Println("failed to execute query", err)
 		w.WriteHeader(500)
@@ -59,7 +60,7 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request) {
 				updatedBalance := account.Balance - changesToAccount.Balance
 
 				queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
-				err = h.R.DB.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
+				err = h.R.Db.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
 				fmt.Println("Balance is substracted on", changesToAccount.Balance, "Result:", updatedBalance)
 				if err != nil {
 					log.Println("failed to execute query", err)
@@ -73,7 +74,7 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request) {
 
 				typeofoperation := "payment to "
 				queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-				_, err = h.R.DB.Exec(queryStmt3, account.Name, date1, changesToAccount.Balance, account.Currency, typeofoperation+changesToPayments.Service) //USE Exec FOR INSERT
+				_, err = h.R.Db.Exec(queryStmt3, account.Name, date1, changesToAccount.Balance, account.Currency, typeofoperation+changesToPayments.Service) //USE Exec FOR INSERT
 				if err != nil {
 					log.Println("failed to execute query - update history:", err)
 					return
@@ -82,7 +83,7 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request) {
 				}
 
 				queryStmt4 := `INSERT INTO payments (username, date, service, quantity, currency) VALUES ($1, $2, $3, $4, $5);`
-				_, err = h.R.DB.Exec(queryStmt4, account.Name, date1, changesToPayments.Service, changesToAccount.Balance, account.Currency) //USE Exec FOR INSERT
+				_, err = h.R.Db.Exec(queryStmt4, account.Name, date1, changesToPayments.Service, changesToAccount.Balance, account.Currency) //USE Exec FOR INSERT
 				if err != nil {
 					log.Println("failed to execute query - update payments:", err)
 					return
