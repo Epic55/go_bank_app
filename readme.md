@@ -1,3 +1,19 @@
+#API METHODS (OPERATIONS WITH ACCOUNT):
+1) LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
+2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
+3) TOPUP AN ACCOUNT - PUT - localhost:8080/accounts/topup/ID
+4) WITHDRAW FROM ACCOUNT - PUT - localhost:8080/accounts/withdraw/ID
+5) TRANSFER BTWN USER ACCOUNTS - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
+6) TRANSFER BTWN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
+7) DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
+8) BLOCK ACCOUNT - PUT - localhost:8080/accounts/blocking/ID
+9) LOOK HISTORY - GET - localhost:8080/history/USERNAME
+10) PAYMENTS - PUT - localhost:8080/payments/ID
+11) LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
+12) LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
+13) SAVE STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
+
+
 PLAN TO DO:
 1) SEND BY PHONE 
 2) SEND BY CARD - 
@@ -17,24 +33,8 @@ Return the payload back to the user through the HTTP server.
 9) CASHBACK WITH PAYMENT
 
 
-- DO AN APP USING: INTERFACE + GOR + MUTEX + WG + CHANNEL + SELECT
+DO AN APP USING: INTERFACE + GOR + MUTEX + WG + CHANNEL + SELECT
 
-
-
-#API METHODS (OPERATIONS WITH ACCOUNT):
-1) LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
-2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
-3) TOPUP AN ACCOUNT - PUT - localhost:8080/accounts/topup/ID
-4) WITHDRAW FROM ACCOUNT - PUT - localhost:8080/accounts/withdraw/ID
-5) TRANSFER BTWN USER ACCOUNTS - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
-6) TRANSFER BTWN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
-7) DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
-8) BLOCK ACCOUNT - PUT - localhost:8080/accounts/blocking/ID
-9) LOOK HISTORY - GET - localhost:8080/history/USERNAME
-10) PAYMENTS - PUT - localhost:8080/payments/ID
-11) LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
-12) LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
-13) SAVE STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
 
 #JSON BODY FOR API METHODS:
 {
