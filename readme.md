@@ -15,8 +15,7 @@
 
 
 PLAN TO DO:
-1) SEND BY PHONE 
-2) SEND BY CARD - 
+1) 
 Implement the Luhn algorithm. 
 Create an HTTP server. 
 Configure the server to respond to GET requests having a JSON payload.
@@ -25,11 +24,8 @@ Extract the credit card number from the JSON payload.
 Run the Luhn algorithm on the number. 
 Wrap the result into a JSON response payload. 
 Return the payload back to the user through the HTTP server.
-3) OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT). IMPLEMENT PRODUCTS BY USING INTERFACE WITH DIFFERENT STRUCTS.
-4) SET PIN, WITHDRAW BY PIN
-- IMPLEMENT LIMITS BY CARD
-- PAY CREDIT
-- CASHBACK WITH PAYMENT
+2) SET PIN, WITHDRAW BY PIN
+IMPLEMENT LIMITS BY CARD, PAY CREDIT, CASHBACK WITH PAYMENT, SEND BY PHONE & CARD, OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT). 
 
 
 DO AN APP USING: INTERFACE + GOR + MUTEX + WG + CHANNEL + SELECT
