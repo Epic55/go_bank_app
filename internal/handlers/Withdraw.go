@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -12,6 +13,11 @@ import (
 	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
 )
+
+type withdraw struct {
+	Balance int
+	Pin     int
+}
 
 func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	var m sync.Mutex
@@ -29,6 +35,10 @@ func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request, ctx context.C
 
 	var changesToAccount models.Account
 	json.Unmarshal(body, &changesToAccount)
+
+	var pin withdraw
+	json.Unmarshal(body, &pin)
+	fmt.Println(pin)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
 	results, err := h.R.Db.Query(queryStmt, id)
@@ -50,25 +60,41 @@ func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request, ctx context.C
 
 	date := time.Now()
 	date1 := date.Format("2006-01-02 15:04:05")
-	if !account.Blocked {
 
-		if account.Balance >= changesToAccount.Balance {
-			updatedBalance := account.Balance - changesToAccount.Balance
+	if checkPin(pin.Pin) {
+		if !account.Blocked {
 
-			typeofoperation2 := "withdrawed"
-			m.Lock()
-			h.R.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
-			m.Unlock()
+			if account.Balance >= changesToAccount.Balance {
+				updatedBalance := account.Balance - changesToAccount.Balance
 
-			typeofoperation := "withdraw"
-			h.R.UpdateHistory(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
+				typeofoperation2 := "withdrawed"
+				m.Lock()
+				h.R.UpdateAccount(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
+				m.Unlock()
+
+				typeofoperation := "withdraw"
+				h.R.UpdateHistory(typeofoperation, account.Name, account.Currency, changesToAccount.Balance, date1)
+
+			} else {
+				NotEnoughMoney(w)
+			}
 
 		} else {
-			NotEnoughMoney(w)
+			AccountIsBlocked(w, account.Name, account.Id)
 		}
-
 	} else {
-		AccountIsBlocked(w, account.Name, account.Id)
+		fmt.Println("PIN is incorrect")
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("PIN is incorrect")
 	}
 
+}
+
+func checkPin(item int) bool { //CHECK FOR PIN
+	const pin = 1234
+	if pin == item {
+		return true
+	}
+	return false
 }

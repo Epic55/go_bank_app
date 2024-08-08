@@ -94,32 +94,3 @@ func (h *Handler) GetStatement(w http.ResponseWriter, r *http.Request, ctx conte
 	json.NewEncoder(w).Encode("Statement saved to a file")
 
 }
-
-// func sendMail(history2) {
-// 	auth := smtp.PlainAuth(
-// 		"",
-// 		"epic555@yandex.ru",
-// 		"your-email-password",
-// 		"smtp.example.com",
-// 	)
-
-// 	from := "epic555@yandex.ru"
-// 	to := []string{"alibek555@gmail.com"}
-// 	subject := "Subject: Test Email\n"
-// 	body := history2
-
-// 	msg := []byte(subject + "\n" + body)
-
-// 	err := smtp.SendMail(
-// 		"smtp.example.com:587",
-// 		auth,
-// 		from,
-// 		to,
-// 		msg,
-// 	)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	log.Println("Email sent successfully!")
-// }
