@@ -2,7 +2,7 @@
 1) LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
 2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
 3) TOPUP AN ACCOUNT - PUT - localhost:8080/accounts/topup/ID
-4) WITHDRAW FROM ACCOUNT - PUT - localhost:8080/accounts/withdraw/ID
+4) WITHDRAW FROM ACCOUNT WITH PIN - PUT - localhost:8080/accounts/withdraw/ID
 5) TRANSFER BTWN USER ACCOUNTS - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
 6) TRANSFER BTWN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
 7) DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
@@ -24,12 +24,10 @@ Extract the credit card number from the JSON payload.
 Run the Luhn algorithm on the number. 
 Wrap the result into a JSON response payload. 
 Return the payload back to the user through the HTTP server.
-2) SET PIN, WITHDRAW BY PIN
+
 IMPLEMENT LIMITS BY CARD, PAY CREDIT, CASHBACK WITH PAYMENT, SEND BY PHONE & CARD, OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT). 
 
-
 DO AN APP USING: INTERFACE + GOR + MUTEX + WG + CHANNEL + SELECT
-
 
 #JSON BODY FOR API METHODS:
 {

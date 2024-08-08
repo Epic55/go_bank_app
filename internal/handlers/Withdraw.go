@@ -38,7 +38,6 @@ func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request, ctx context.C
 
 	var pin withdraw
 	json.Unmarshal(body, &pin)
-	fmt.Println(pin)
 
 	queryStmt := `SELECT * FROM accounts WHERE id = $1 ;`
 	results, err := h.R.Db.Query(queryStmt, id)
