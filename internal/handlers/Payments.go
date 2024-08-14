@@ -59,38 +59,11 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request, ctx context.C
 			if account.Balance >= changesToAccount.Balance {
 				updatedBalance := account.Balance - changesToAccount.Balance
 
-				queryStmt2 := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
-				err = h.R.Db.QueryRow(queryStmt2, &id, &updatedBalance, &account.Currency, date1).Scan(&id)
-				fmt.Println("Balance is substracted on", changesToAccount.Balance, "Result:", updatedBalance)
-				if err != nil {
-					log.Println("failed to execute query", err)
-					w.WriteHeader(500)
-					return
-				}
-
-				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
-				json.NewEncoder(w).Encode("Payment is done")
-
-				typeofoperation := "payment to "
-				queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-				_, err = h.R.Db.Exec(queryStmt3, account.Name, date1, changesToAccount.Balance, account.Currency, typeofoperation+changesToPayments.Service) //USE Exec FOR INSERT
-				if err != nil {
-					log.Println("failed to execute query - update history:", err)
-					return
-				} else {
-					fmt.Println("History is updated")
-				}
-
-				queryStmt4 := `INSERT INTO payments (username, date, service, quantity, currency) VALUES ($1, $2, $3, $4, $5);`
-				_, err = h.R.Db.Exec(queryStmt4, account.Name, date1, changesToPayments.Service, changesToAccount.Balance, account.Currency) //USE Exec FOR INSERT
-				if err != nil {
-					log.Println("failed to execute query - update payments:", err)
-					return
-				} else {
-					fmt.Println("Payments is updated")
-				}
-
+				typeofoperation2 := "withdraw"
+				h.R.UpdateAccountPayment(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
+				
+				typeofoperation := "payment"
+				h.R.UpdateHistoryPayment(account.Name, account.Currency, date1, changesToPayments.Service, changesToAccount.Balance)
 			} else {
 				NotEnoughMoney(w)
 			}

@@ -184,7 +184,7 @@ func (r *Repository) UpdateHistory(typeofoperation,
 	}
 }
 
-func (h *Repository) UpdateAccounts(w http.ResponseWriter,
+func (r *Repository) UpdateAccountTransferLocal(w http.ResponseWriter,
 	id, id2,
 	accountSenderName,
 	accountSenderCurrency,
@@ -201,7 +201,7 @@ func (h *Repository) UpdateAccounts(w http.ResponseWriter,
 	updatedBalanceSender := accountSenderBalance - changesToAccountSenderBalance
 
 	queryStmt2 := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
-	err := h.Db.QueryRow(queryStmt2, &id, &updatedBalanceSender, date).Scan(&id)
+	err := r.Db.QueryRow(queryStmt2, &id, &updatedBalanceSender, date).Scan(&id)
 	fmt.Printf("Sender account is withdrawed on %.2f Result: %.2f\n", changesToAccountSenderBalance, updatedBalanceSender)
 	if err != nil {
 		log.Println("failed to execute query - update accounts withdraw", err)
@@ -212,7 +212,7 @@ func (h *Repository) UpdateAccounts(w http.ResponseWriter,
 	updatedBalanceReceiver := accountReceiverBalance + changesToAccountReceiverBalance
 
 	queryStmt4 := `UPDATE accounts SET balance = $2, date = $3 WHERE account = $1 RETURNING id;`
-	err = h.Db.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date).Scan(&id2)
+	err = r.Db.QueryRow(queryStmt4, &id2, &updatedBalanceReceiver, date).Scan(&id2)
 	fmt.Printf("Receiver account is topped up on %.2f Result: %.2f\n", changesToAccountReceiverBalance, updatedBalanceReceiver)
 	if err != nil {
 		log.Println("failed to execute query - update accounts topup", err)
@@ -225,7 +225,7 @@ func (h *Repository) UpdateAccounts(w http.ResponseWriter,
 	json.NewEncoder(w).Encode("Balances is updated on " + strconv.FormatFloat(changesToAccountReceiverBalance, 'f', 2, 64) + ". Result: " + strconv.FormatFloat(updatedBalanceReceiver, 'f', 2, 64))
 }
 
-func (h *Repository) UpdateHistory2(typeofoperation,
+func (r *Repository) UpdateHistoryTransferLocal(typeofoperation,
 	typeofoperation2,
 	accountSenderName,
 	accountSenderCurrency,
@@ -238,7 +238,7 @@ func (h *Repository) UpdateHistory2(typeofoperation,
 	date string) {
 
 	queryStmt3 := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-	_, err := h.Db.Exec(queryStmt3, accountSenderName, date, changesToAccountSenderBalance, accountSenderCurrency, typeofoperation+accountSenderAccount) //USE Exec FOR INSERT
+	_, err := r.Db.Exec(queryStmt3, accountSenderName, date, changesToAccountSenderBalance, accountSenderCurrency, typeofoperation+accountSenderAccount) //USE Exec FOR INSERT
 	if err != nil {
 		log.Println("failed to execute query - update history sender:", err)
 		return
@@ -247,11 +247,57 @@ func (h *Repository) UpdateHistory2(typeofoperation,
 	}
 
 	queryStmt3 = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
-	_, err = h.Db.Exec(queryStmt3, accountReceiverName, date, changesToAccountReceiverBalance, accountReceiverCurrency, typeofoperation2+accountReceiverAccount) //USE Exec FOR INSERT
+	_, err = r.Db.Exec(queryStmt3, accountReceiverName, date, changesToAccountReceiverBalance, accountReceiverCurrency, typeofoperation2+accountReceiverAccount) //USE Exec FOR INSERT
 	if err != nil {
 		log.Println("failed to execute query - update history receiver:", err)
 		return
 	} else {
 		fmt.Println("History is updated")
+	}
+}
+
+func (r *Repository) UpdateAccountPayment(w http.ResponseWriter,
+	updatedBalance, changesToAccountBalance float64,
+	id, accountCurrency, typeofoperation2, date1 string,
+) {
+	queryStmt := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
+	err := r.Db.QueryRow(queryStmt, &id, &updatedBalance, &accountCurrency, date1).Scan(&id)
+	fmt.Println("Balance is substracted on", changesToAccountBalance, "Result:", updatedBalance)
+	if err != nil {
+		log.Println("failed to execute query", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Payment is done")
+
+}
+
+func (r *Repository) UpdateHistoryPayment(
+	accountName, accountCurrency, date1, changesToPaymentsService string,
+	changesToAccountBalance float64) {
+	typeofoperation := "payment to "
+	queryStmt := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+	_, err := r.Db.Exec(queryStmt, accountName, date1, changesToAccountBalance, accountCurrency, typeofoperation+changesToPaymentsService) //USE Exec FOR INSERT
+	if err != nil {
+		log.Println("failed to execute query - update history:", err)
+		return
+	} else {
+		fmt.Println("History is updated")
+	}
+}
+
+func (r *Repository) UpdatePayments(
+	accountName, date1, changesToPaymentsService, accountCurrency string,
+) {
+	queryStmt := `INSERT INTO payments (username, date, service, quantity, currency) VALUES ($1, $2, $3, $4, $5);`
+	_, err := r.Db.Exec(queryStmt, accountName, date1, changesToPayments.Service, changesToPaymentsService, accountCurrency) //USE Exec FOR INSERT
+	if err != nil {
+		log.Println("failed to execute query - update payments:", err)
+		return
+	} else {
+		fmt.Println("Payments is updated")
 	}
 }

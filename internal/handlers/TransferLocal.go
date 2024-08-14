@@ -88,7 +88,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-				h.R.UpdateAccounts(w, id, id2,
+				h.R.UpdateAccountTransferLocal(w, id, id2,
 					accountSender.Name,
 					accountSender.Currency,
 					accountSender.Account,
@@ -104,7 +104,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.R.UpdateHistory2(typeofoperation,
+				h.R.UpdateHistoryTransferLocal(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -123,7 +123,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 			changesToAccountSender.Balance = changesToAccountSender.Balance / ExchangeRate
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-				h.R.UpdateAccounts(w, id, id2,
+				h.R.UpdateAccountTransferLocal(w, id, id2,
 					accountSender.Name,
 					accountSender.Currency,
 					accountSender.Account,
@@ -139,7 +139,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.R.UpdateHistory2(typeofoperation,
+				h.R.UpdateHistoryTransferLocal(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
@@ -157,7 +157,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
-				h.R.UpdateAccounts(w, id, id2,
+				h.R.UpdateAccountTransferLocal(w, id, id2,
 					accountSender.Name,
 					accountSender.Currency,
 					accountSender.Account,
@@ -173,7 +173,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
-				h.R.UpdateHistory2(typeofoperation,
+				h.R.UpdateHistoryTransferLocal(typeofoperation,
 					typeofoperation2,
 					accountSender.Name,
 					accountSender.Currency,
