@@ -64,6 +64,8 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request, ctx context.C
 				
 				typeofoperation := "payment"
 				h.R.UpdateHistoryPayment(account.Name, account.Currency, date1, changesToPayments.Service, changesToAccount.Balance)
+				
+				h.R.UpdatePayments(account.Name, date1,  , changesToPayments.Service, account.Currency)
 			} else {
 				NotEnoughMoney(w)
 			}
