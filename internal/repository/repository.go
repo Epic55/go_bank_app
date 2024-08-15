@@ -258,7 +258,7 @@ func (r *Repository) UpdateHistoryTransferLocal(typeofoperation,
 
 func (r *Repository) UpdateAccountPayment(w http.ResponseWriter,
 	updatedBalance, changesToAccountBalance float64,
-	id, accountCurrency, typeofoperation2, date1 string,
+	id, accountCurrency, date1 string,
 ) {
 	queryStmt := `UPDATE accounts SET balance = $2, currency = $3, date = $4 WHERE id = $1 RETURNING id;`
 	err := r.Db.QueryRow(queryStmt, &id, &updatedBalance, &accountCurrency, date1).Scan(&id)

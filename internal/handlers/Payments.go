@@ -59,10 +59,8 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request, ctx context.C
 			if account.Balance >= changesToAccount.Balance {
 				updatedBalance := account.Balance - changesToAccount.Balance
 
-				typeofoperation2 := "payment"
-				h.R.UpdateAccountPayment(w, updatedBalance, changesToAccount.Balance, id, account.Currency, typeofoperation2, date1)
+				h.R.UpdateAccountPayment(w, updatedBalance, changesToAccount.Balance, id, account.Currency, date1)
 
-				//typeofoperation := "payment"
 				h.R.UpdateHistoryPayment(account.Name, account.Currency, date1, changesToPayments.Service, changesToAccount.Balance)
 
 				h.R.UpdatePayments(account.Name, date1, changesToPayments.Service, changesToAccount.Balance, account.Currency)
