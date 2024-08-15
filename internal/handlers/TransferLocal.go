@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/epic55/BankApp/internal/models"
@@ -75,6 +76,9 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 
 	GetExchangeRate(w, r)
 
+	updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
+	updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
+
 	if accountSender.Blocked || accountReceiver.Blocked {
 
 		fmt.Println("Operation is not permitted. Account is blocked -")
@@ -99,7 +103,13 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 					accountSender.Balance,
 					changesToAccountSender.Balance,
 					changesToAccountReceiver.Balance,
+					updatedBalanceSender,
+					updatedBalanceReceiver,
 					date1)
+
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode("Balances is updated on " + strconv.FormatFloat(changesToAccountReceiver.Balance, 'f', 2, 64) + ". Result: " + strconv.FormatFloat(updatedBalanceReceiver, 'f', 2, 64))
 
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
@@ -134,6 +144,8 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 					accountSender.Balance,
 					changesToAccountSender.Balance,
 					changesToAccountReceiver.Balance,
+					updatedBalanceSender,
+					updatedBalanceReceiver,
 					date1)
 
 				typeofoperation := "transfer btwn my acccounts from "
@@ -168,6 +180,8 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 					accountSender.Balance,
 					changesToAccountSender.Balance,
 					changesToAccountReceiver.Balance,
+					updatedBalanceSender,
+					updatedBalanceReceiver,
 					date1)
 
 				typeofoperation := "transfer btwn my acccounts from "

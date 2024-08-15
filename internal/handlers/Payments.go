@@ -61,6 +61,10 @@ func (h *Handler) Payments(w http.ResponseWriter, r *http.Request, ctx context.C
 
 				h.R.UpdateAccountPayment(w, updatedBalance, changesToAccount.Balance, id, account.Currency, date1)
 
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode("Payment is done")
+
 				h.R.UpdateHistoryPayment(account.Name, account.Currency, date1, changesToPayments.Service, changesToAccount.Balance)
 
 				h.R.UpdatePayments(account.Name, date1, changesToPayments.Service, changesToAccount.Balance, account.Currency)
