@@ -30,7 +30,7 @@ type Payments struct {
 	Username string  `json:"username,omitempty"`
 	Date     string  `json:"date"`
 	Service  string  `json:"service"`
-	Quantity float64 `json:"quantity"`
+	Price    float64 `json:"price"`
 	Currency string  `json:"currency"`
 }
 

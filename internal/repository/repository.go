@@ -124,7 +124,7 @@ func CreateTable(db *sql.DB) {
 	}
 
 	if !exists3 {
-		_, err := db.Query("CREATE TABLE payments (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date VARCHAR(20) NOT NULL, service VARCHAR(20) NOT NULL, quantity NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL);")
+		_, err := db.Query("CREATE TABLE payments (id serial PRIMARY KEY, username VARCHAR(20) NOT NULL, date VARCHAR(20) NOT NULL, service VARCHAR(20) NOT NULL, price NUMERIC(10, 2) NOT NULL, currency VARCHAR(3) NOT NULL);")
 		if err != nil {
 			log.Println("failed to execute query", err)
 			return
@@ -290,10 +290,12 @@ func (r *Repository) UpdateHistoryPayment(
 }
 
 func (r *Repository) UpdatePayments(
-	accountName, date1, changesToPaymentsService, accountCurrency string,
+	accountName, date1, changesToPaymentsService string,
+	changesToPaymentsPrice float64,
+	changesToPaymentsCurrency string,
 ) {
-	queryStmt := `INSERT INTO payments (username, date, service, quantity, currency) VALUES ($1, $2, $3, $4, $5);`
-	_, err := r.Db.Exec(queryStmt, accountName, date1, changesToPayments.Service, changesToPaymentsService, accountCurrency) //USE Exec FOR INSERT
+	queryStmt := `INSERT INTO payments (username, date, service, price, currency) VALUES ($1, $2, $3, $4, $5);`
+	_, err := r.Db.Exec(queryStmt, accountName, date1, changesToPaymentsService, changesToPaymentsPrice, changesToPaymentsCurrency) //USE Exec FOR INSERT
 	if err != nil {
 		log.Println("failed to execute query - update payments:", err)
 		return
