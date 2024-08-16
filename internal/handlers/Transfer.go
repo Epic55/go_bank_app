@@ -84,9 +84,31 @@ func (h *Handler) Transfer(w http.ResponseWriter, r *http.Request, ctx context.C
 			updatedBalanceSender := accountSender.Balance - changesToAccountSender.Balance
 			updatedBalanceReceiver := accountReceiver.Balance + changesToAccountReceiver.Balance
 
-			UpdateAccountTransfer()
+			h.R.UpdateAccountTransfer(w, id, id2,
+				accountSender.Name,
+				accountSender.Currency,
+				accountSender.Account,
+				accountReceiver.Name,
+				accountReceiver.Currency,
+				accountReceiver.Account,
+				accountReceiver.Balance,
+				accountSender.Balance,
+				changesToAccountSender.Balance,
+				changesToAccountReceiver.Balance,
+				updatedBalanceSender,
+				updatedBalanceReceiver,
+				date1)
 
-			UpdateHistoryTransfer()
+			h.R.UpdateHistoryTransfer(
+				accountSender.Name,
+				accountSender.Currency,
+				accountSender.Account,
+				accountReceiver.Name,
+				accountReceiver.Currency,
+				accountReceiver.Account,
+				changesToAccountSender.Balance,
+				changesToAccountReceiver.Balance,
+				date1)
 
 		} else {
 			NotEnoughMoney(w)
