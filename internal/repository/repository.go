@@ -298,3 +298,48 @@ func (r *Repository) UpdatePayments(
 		fmt.Println("Payments is updated")
 	}
 }
+
+func (r *Repository) UpdateAccountTransfer() {
+	queryStmt := `UPDATE accounts SET balance = $2, date = $3  WHERE id = $1 RETURNING id;`
+	err := r.Db.QueryRow(queryStmt, &id, &updatedBalanceSender, date1).Scan(&id)
+	fmt.Printf("Sender Balance is withdrawed on %.2f Result: %.2f\n", changesToAccountSender.Balance, updatedBalanceSender)
+	if err != nil {
+		log.Println("failed to execute query", err)
+		w.WriteHeader(500)
+		return
+	}
+	queryStmt = `UPDATE accounts SET balance = $2, date = $3 WHERE id = $1 RETURNING id;`
+	err = r.Db.QueryRow(queryStmt, &id2, &updatedBalanceReceiver, date1).Scan(&id2)
+	fmt.Printf("Receiver Balance is topped on %.2f Result: %.2f\n", changesToAccountReceiver.Balance, updatedBalanceReceiver)
+	if err != nil {
+		log.Println("failed to execute query", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Balances is updated")
+}
+
+func (r *Repository) UpdateHistoryTransfer() {
+	typeofoperation := "transfer to "
+	queryStmt := `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+	_, err := r.Db.Exec(queryStmt, accountSender.Name, date1, changesToAccountSender.Balance, accountSender.Currency, typeofoperation+accountReceiver.Name) //USE Exec FOR INSERT
+	if err != nil {
+		log.Println("failed to execute query - update history:", err)
+		return
+	} else {
+		fmt.Println("History is updated")
+	}
+
+	typeofoperation2 := "topup from user "
+	queryStmt = `INSERT INTO history (username, date, quantity, currency, typeofoperation) VALUES ($1, $2, $3, $4, $5);`
+	_, err = r.Db.Exec(queryStmt, accountReceiver.Name, date1, changesToAccountReceiver.Balance, accountReceiver.Currency, typeofoperation2+accountSender.Name) //USE Exec FOR INSERT
+	if err != nil {
+		log.Println("failed to execute query - update history:", err)
+		return
+	} else {
+		fmt.Println("History is updated")
+	}
+}
