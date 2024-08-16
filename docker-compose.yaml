@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+
+  minio:
+    image: quay.io/minio/minio
+    ports:
+      - "9000:9000"  # Minio access port
+      - "9001:9001"  # Minio console access port
+    environment:
+      MINIO_ROOT_USER: admin  # Set the root user
+      MINIO_ROOT_PASSWORD: Test1234  # Set the root password
+    command: server /data --console-address ":9001"
