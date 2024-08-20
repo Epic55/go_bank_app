@@ -1,5 +1,5 @@
 Preparation to laucnh this app:
-- create database in Postgresql and set connection details. DB will be fulfilled with mock data from internal/mocks/mocks.go file.
+- create database in Postgresql and set connection details in config.json and internal/repository/repository.go files. DB will be fulfilled with mock data from internal/mocks/mocks.go file.
 - create Minio Server. You can do it whit docker-compose.yaml file, launch command:
 docker-compose up -d
 Files with statements will be saved to Minio.
@@ -20,9 +20,5 @@ AN APP HAS THESE API METHODS (OPERATIONS WITH ACCOUNT):
 11) LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
 12) LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
 13) SAVE A STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
-
-PLAN TO DO:
-where to save config
-check minio connection
 
 IDEAS TO IMPLEMENT: LIMITS BY CARD, PAY CREDIT, CASHBACK WITH PAYMENT, SEND BY PHONE & CARD, OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT), CHECK CARD WHEN SENDING.

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +13,8 @@ import (
 	"github.com/epic55/BankApp/internal/handlers"
 	"github.com/epic55/BankApp/internal/initconfig"
 	"github.com/epic55/BankApp/internal/models"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"github.com/epic55/BankApp/internal/repository"
 	"github.com/gorilla/mux"
@@ -37,9 +40,37 @@ func init() {
 		fmt.Println("Failed to initialize the config:", err)
 		return
 	}
+	checkMinio()
 	Repo = repository.NewRepository(Cnfg.ConnectionString)
 	Hand = handlers.NewHandler(Repo, Cnfg)
 
+}
+
+func checkMinio() {
+	endpoint := "localhost:9000"
+	accessKeyID := "DxePRgwe4h7VXPy3pToa"                         //hom - "aAPXi7oCUJbEv4Ahrw3v"
+	secretAccessKey := "g3ocvoCUAUNgHmmIZIPXhxfMWGkiyfYSRmBfypbN" //hom - "s9pHIAVtCwjDfL9QWQwzayKS4KJwrxBzvP1LV550"
+	useSSL := false
+
+	// Initialize minio client object.
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure: useSSL,
+	})
+	if err != nil {
+		log.Fatalln("Couldnt connect to MinIO - ", err)
+	}
+
+	//Check if the connection is successful by listing buckets
+	ctx := context.Background()
+	buckets, err := minioClient.ListBuckets(ctx)
+	if err != nil {
+		log.Fatalln("Couldnt connect to MinIO - ", err)
+	}
+	fmt.Println("Successfully connected to MinIO")
+	for _, bucket := range buckets {
+		fmt.Println(bucket.Name)
+	}
 }
 
 func (a *Application) StartServer() {

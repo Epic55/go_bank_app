@@ -26,9 +26,7 @@ const (
 )
 
 func NewRepository(ConnectionString string) *Repository {
-	ConnectionString1 := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	ConnectionString1 := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := sql.Open("postgres", ConnectionString1)
 	if err != nil {
 		log.Fatal(err)
