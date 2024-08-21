@@ -13,6 +13,8 @@ import (
 	"github.com/epic55/BankApp/internal/handlers"
 	"github.com/epic55/BankApp/internal/initconfig"
 	"github.com/epic55/BankApp/internal/models"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
@@ -40,20 +42,50 @@ func init() {
 		fmt.Println("Failed to initialize the config:", err)
 		return
 	}
-	checkMinio()
+	checkConnectionDB()
+	checkConnectionMinio()
 	Repo = repository.NewRepository(Cnfg.ConnectionString)
 	Hand = handlers.NewHandler(Repo, Cnfg)
 
 }
 
-func checkMinio() {
-	endpoint := "localhost:9000"
-	accessKeyID := "DxePRgwe4h7VXPy3pToa"                         //hom - "aAPXi7oCUJbEv4Ahrw3v"
-	secretAccessKey := "g3ocvoCUAUNgHmmIZIPXhxfMWGkiyfYSRmBfypbN" //hom - "s9pHIAVtCwjDfL9QWQwzayKS4KJwrxBzvP1LV550"
+func checkConnectionDB() {
+	connString := "postgres://postgres:1@localhost:5432/postgres"
+
+	// Create a connection pool
+	config, err := pgxpool.ParseConfig(connString)
+	if err != nil {
+		log.Fatalf("Unable to parse connection string: %v\n", err)
+	}
+
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		log.Fatalf("Unable to create connection pool: %v\n", err)
+	}
+	defer pool.Close()
+
+	// Ping the database to check connection
+	err = pool.Ping(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to connect to DB") //: %v\n", err)
+	}
+
+	fmt.Println("Successfully connected to PostgreSQL DB!")
+}
+
+func checkConnectionMinio() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file 1")
+	}
+
+	minio_url := os.Getenv("minio_url")
+	accessKeyID := os.Getenv("minio_access_key")
+	secretAccessKey := os.Getenv("minio_secret_Key")
 	useSSL := false
 
 	// Initialize minio client object.
-	minioClient, err := minio.New(endpoint, &minio.Options{
+	minioClient, err := minio.New(minio_url, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: useSSL,
 	})
@@ -67,7 +99,7 @@ func checkMinio() {
 	if err != nil {
 		log.Fatalln("Couldnt connect to MinIO - ", err)
 	}
-	fmt.Println("Successfully connected to MinIO")
+	fmt.Print("Successfully connected to MinIO - Bucket: ")
 	for _, bucket := range buckets {
 		fmt.Println(bucket.Name)
 	}

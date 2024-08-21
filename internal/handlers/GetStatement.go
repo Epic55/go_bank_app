@@ -10,19 +10,20 @@ import (
 
 	"github.com/epic55/BankApp/internal/models"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-const (
-	endpoint        = "localhost:9000"
-	accessKeyID     = "aAPXi7oCUJbEv4Ahrw3v"
-	secretAccessKey = "s9pHIAVtCwjDfL9QWQwzayKS4KJwrxBzvP1LV550"
-	useSSL          = false
-	bucketName      = "buc"
-	objectName      = "statement.txt"
-	filePath        = "C:\\Users\\alibe\\Desktop\\statement.txt" // Path to the file you want to upload
-)
+//const (
+//endpoint        = "localhost:9000"
+//accessKeyID     = "aAPXi7oCUJbEv4Ahrw3v"
+//secretAccessKey = "s9pHIAVtCwjDfL9QWQwzayKS4KJwrxBzvP1LV550"
+
+// bucketName      = "buc"
+// objectName      = "statement.txt"
+// filePath = "C:\\Users\\alibe\\Desktop\\statement.txt" // Path to the file you want to upload
+//)
 
 func (h *Handler) GetStatement(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 	vars := mux.Vars(r)
@@ -48,7 +49,20 @@ func (h *Handler) GetStatement(w http.ResponseWriter, r *http.Request, ctx conte
 		history2 = append(history2, history)
 	}
 
-	minioClient, err := minio.New(endpoint, &minio.Options{
+	err = godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file 2")
+	}
+
+	minio_url := os.Getenv("minio_url")
+	accessKeyID := os.Getenv("minio_access_key")
+	secretAccessKey := os.Getenv("minio_secret_Key")
+	bucketName := os.Getenv("minio_bucket_name")
+	objectName := os.Getenv("minio_object_name")
+	filePath := "C:\\Users\\alibe\\Desktop\\statement.txt"
+	useSSL := false
+
+	minioClient, err := minio.New(minio_url, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: useSSL,
 	})

@@ -1,8 +1,7 @@
 Preparation to laucnh this app:
-- create database in Postgresql and set connection details in config.json and internal/repository/repository.go files. DB will be fulfilled with mock data from internal/mocks/mocks.go file.
-- create Minio Server. You can do it whit docker-compose.yaml file, launch command:
-docker-compose up -d
-Files with statements will be saved to Minio.
+- create database in Postgresql and set connection details in config.json and .env files. DB will be fulfilled with mock data from internal/mocks/mocks.go file.
+- create Minio Server. You can do it with docker-compose.yaml file, launch command: `docker-compose up -d`
+Set connection details in .env file. Files with statements will be saved to Minio.
 
 I used gorilla mux framework for HTTP routing.
 

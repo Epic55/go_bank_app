@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -17,16 +18,14 @@ type Repository struct {
 	Db *sql.DB
 }
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "1"
-	dbname   = "postgres"
-)
-
 func NewRepository(ConnectionString string) *Repository {
-	ConnectionString1 := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	host := os.Getenv("db_host")
+	port := os.Getenv("db_port")
+	user := os.Getenv("db_user")
+	password := os.Getenv("db_password")
+	dbname := os.Getenv("db_name")
+	ConnectionString1 := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	//fmt.Println(ConnectionString)
 	db, err := sql.Open("postgres", ConnectionString1)
 	if err != nil {
 		log.Fatal(err)
