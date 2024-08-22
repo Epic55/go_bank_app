@@ -42,15 +42,15 @@ func init() {
 		fmt.Println("Failed to initialize the config:", err)
 		return
 	}
-	checkConnectionDB()
+	checkConnectionDB(Cnfg.ConnectionString)
 	checkConnectionMinio()
 	Repo = repository.NewRepository(Cnfg.ConnectionString)
 	Hand = handlers.NewHandler(Repo, Cnfg)
 
 }
 
-func checkConnectionDB() {
-	connString := "postgres://postgres:1@localhost:5432/postgres"
+func checkConnectionDB(connectionString string) {
+	connString := "postgres://" + connectionString
 
 	// Create a connection pool
 	config, err := pgxpool.ParseConfig(connString)
@@ -64,10 +64,10 @@ func checkConnectionDB() {
 	}
 	defer pool.Close()
 
-	// Ping the database to check connection
+	// Ping the db to check connection
 	err = pool.Ping(context.Background())
 	if err != nil {
-		log.Fatalf("Unable to connect to DB") //: %v\n", err)
+		log.Fatalf("Unable to connect to DB: %v\n", err)
 	}
 
 	fmt.Println("Successfully connected to PostgreSQL DB!")

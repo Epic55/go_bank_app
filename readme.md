@@ -1,11 +1,13 @@
+Mobile banking application.
+
 Preparation to laucnh this app:
-- create database in Postgresql and set connection details in config.json and .env files. DB will be fulfilled with mock data from internal/mocks/mocks.go file.
+- create database in Postgresql and set connection details in config.json and .env files. DB will be fulfilled with mock data from internal/mocks/mocks.go file. I used local Postgresql.
 - create Minio Server. You can do it with docker-compose.yaml file, launch command: `docker-compose up -d`
 Set connection details in .env file. Files with statements will be saved to Minio.
 
 I used gorilla mux framework for HTTP routing.
 
-AN APP HAS THESE API METHODS (OPERATIONS WITH ACCOUNT):
+AN APPLICATION HAS THESE API METHODS (OPERATIONS WITH ACCOUNT):
 1) LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
 2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
 3) TOPUP AN ACCOUNT - PUT - localhost:8080/accounts/topup/ID
