@@ -46,8 +46,6 @@ func (h *Handler) Topup(w http.ResponseWriter, r *http.Request, ctx context.Cont
 		}
 	}
 
-	// h.GetInfoAboutAccount(w, id, Account.Name, Account.Account, Account.Currency, Account.Date, Account.Balance, Account.Blocked, Account.Defaultaccount)
-
 	if !account.Blocked {
 		updatedBalance := account.Balance + changesToAccount.Balance
 

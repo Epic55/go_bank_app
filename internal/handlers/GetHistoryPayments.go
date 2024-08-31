@@ -16,7 +16,7 @@ func (h *Handler) GetHistoryPayments(w http.ResponseWriter, r *http.Request, ctx
 
 	queryStmt := `SELECT date, quantity, currency, typeofoperation FROM history WHERE username = $1 AND typeofoperation LIKE '%payment%';`
 	results, err := h.R.Db.Query(queryStmt, id)
-	//fmt.Println(results)
+
 	if err != nil {
 		log.Println("failed to execute query - get history", err)
 		w.WriteHeader(500)
@@ -34,7 +34,6 @@ func (h *Handler) GetHistoryPayments(w http.ResponseWriter, r *http.Request, ctx
 		}
 		history2 = append(history2, history)
 	}
-	//fmt.Println(history2)
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

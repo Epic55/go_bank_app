@@ -212,6 +212,7 @@ func (a *Application) StartServer() {
 
 }
 
+// do graceful shutdown of app
 func shutdown(quit chan os.Signal) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	s := <-quit
