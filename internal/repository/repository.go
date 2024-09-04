@@ -25,7 +25,7 @@ func NewRepository(ConnectionString string) *Repository {
 	password := os.Getenv("db_password")
 	dbname := os.Getenv("db_name")
 	ConnectionString1 := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	//fmt.Println(ConnectionString)
+
 	db, err := sql.Open("postgres", ConnectionString1)
 	if err != nil {
 		log.Fatal(err)
@@ -197,7 +197,7 @@ func (r *Repository) UpdateAccountTransferLocal(w http.ResponseWriter,
 	updatedBalanceReceiver float64,
 	date string) {
 
-	//updatedBalanceSender := accountSenderBalance - changesToAccountSenderBalance
+	updatedBalanceSender = accountSenderBalance - changesToAccountSenderBalance
 
 	queryStmt := `UPDATE accounts SET balance = $2, date = $3  WHERE account = $1 RETURNING id;`
 	err := r.Db.QueryRow(queryStmt, &id, &updatedBalanceSender, date).Scan(&id)

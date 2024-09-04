@@ -8,18 +8,20 @@ Set connection details in .env file. Files with statements will be saved to Mini
 I used gorilla mux framework for HTTP routing.
 
 AN APPLICATION HAS THESE API METHODS (OPERATIONS WITH ACCOUNT):
-1) LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
-2) LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
-3) TOPUP AN ACCOUNT - PUT - localhost:8080/accounts/topup/ID
-4) WITHDRAW FROM ACCOUNT WITH PIN - PUT - localhost:8080/accounts/withdraw/ID
-5) TRANSFER BETWEEN USER ACCOUNTS - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
-6) TRANSFER BETWEEN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
-7) DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
-8) BLOCK AN ACCOUNT - PUT - localhost:8080/accounts/blocking/ID
-9) LOOK HISTORY - GET - localhost:8080/history/USERNAME
-10) DO PAYMENTS - PUT - localhost:8080/payments/ID
-11) LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
-12) LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
-13) SAVE A STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
+1) TO LOOK ALL USERS ACCOUNTS - GET - localhost:8080/accounts/
+2) TO LOOK AN ACCOUNT - GET - localhost:8080/accounts/ID
+3) TO TOPUP AN ACCOUNT - PUT - localhost:8080/accounts/topup/ID
+4) TO WITHDRAW FROM ACCOUNT WITH PIN - PUT - localhost:8080/accounts/withdraw/ID
+5) TO TRANSFER BETWEEN USER ACCOUNTS - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
+6) MONEY CONVERSION - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
+SET MONEY AMOUNT IN A RECEIVER CURRENCY.
+7) TO TRANSFER BETWEEN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
+8) TO DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
+9) TO BLOCK AN ACCOUNT - PUT - localhost:8080/accounts/blocking/ID
+10) TO LOOK HISTORY - GET - localhost:8080/history/USERNAME
+11) TO MAKE PAYMENTS - PUT - localhost:8080/payments/ID
+12) TO LOOK HISTORY OF PAYMENTS - GET - localhost:8080/history/payments/USERNAME
+13) TO LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
+14) TO SAVE A STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
 
 IDEAS TO IMPLEMENT: LIMITS BY CARD, PAY CREDIT, CASHBACK WITH PAYMENT, SEND BY PHONE & CARD, OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT), CHECK CARD WHEN SENDING.

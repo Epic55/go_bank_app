@@ -87,7 +87,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 		json.NewEncoder(w).Encode("Operation is not permitted. Account is blocked")
 
 	} else {
-		if accountReceiver.Currency == "usd" && accountSender.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance*ExchangeRate {
+		if accountSender.Currency == "tg" && accountReceiver.Currency == "usd" && accountSender.Balance >= changesToAccountSender.Balance*ExchangeRate {
 			changesToAccountSender.Balance = changesToAccountSender.Balance * ExchangeRate
 
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
@@ -129,7 +129,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 				NotEnoughMoney(w)
 			}
 
-		} else if accountReceiver.Currency == "tg" && accountSender.Currency == "usd" && accountSender.Balance >= changesToAccountSender.Balance/ExchangeRate && changesToAccountSender.Balance >= ExchangeRate {
+		} else if accountSender.Currency == "usd" && accountReceiver.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance/ExchangeRate && changesToAccountSender.Balance >= ExchangeRate {
 			changesToAccountSender.Balance = changesToAccountSender.Balance / ExchangeRate
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
@@ -148,6 +148,10 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 					updatedBalanceReceiver,
 					date1)
 
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode("Balances is updated on " + strconv.FormatFloat(changesToAccountReceiver.Balance, 'f', 2, 64) + ". Result: " + strconv.FormatFloat(updatedBalanceReceiver, 'f', 2, 64))
+
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
 
@@ -165,7 +169,7 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 			} else {
 				NotEnoughMoney(w)
 			}
-		} else if accountReceiver.Currency == "tg" && accountSender.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance {
+		} else if accountSender.Currency == "tg" && accountReceiver.Currency == "tg" && accountSender.Balance >= changesToAccountSender.Balance {
 
 			if accountSender.Balance >= changesToAccountSender.Balance { //CHECK BALANCE OF SENDER, CAN HE AFFORD TO SEND MONEY
 
@@ -183,6 +187,10 @@ func (h *Handler) TransferLocal(w http.ResponseWriter, r *http.Request, ctx cont
 					updatedBalanceSender,
 					updatedBalanceReceiver,
 					date1)
+
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode("Balances is updated on " + strconv.FormatFloat(changesToAccountReceiver.Balance, 'f', 2, 64) + ". Result: " + strconv.FormatFloat(updatedBalanceReceiver, 'f', 2, 64))
 
 				typeofoperation := "transfer btwn my acccounts from "
 				typeofoperation2 := "transfer btwn my acccounts to "
