@@ -14,8 +14,6 @@ AN APPLICATION HAS THESE API METHODS (OPERATIONS WITH ACCOUNT):
 4) TO WITHDRAW FROM ACCOUNT WITH PIN - PUT - localhost:8080/accounts/withdraw/ID
 5) TO TRANSFER BETWEEN USER ACCOUNTS - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
 6) MONEY CONVERSION - PUT - localhost:8080/accounts/transferlocal/ACCOUNT1/ACCOUNT2
-
-SET MONEY AMOUNT IN A RECEIVER CURRENCY.
 7) TO TRANSFER BETWEEN USERS - PUT - localhost:8080/accounts/transfer/ID/ID
 8) TO DELETE AN ACCOUNT - DELETE -  localhost:8080/accounts/delete/ID
 9) TO BLOCK AN ACCOUNT - PUT - localhost:8080/accounts/blocking/ID
@@ -25,4 +23,6 @@ SET MONEY AMOUNT IN A RECEIVER CURRENCY.
 13) TO LOOK HISTORY OF TRANSFERS - GET - localhost:8080/history/transfers/USERNAME
 14) TO SAVE A STATEMENT TO A FILE - GET - localhost:8080/statement/USERNAME
 
-IDEAS TO IMPLEMENT: LIMITS BY CARD, PAY CREDIT, CASHBACK WITH PAYMENT, SEND BY PHONE & CARD, OPEN A NEW PRODUCT (CARD, DEPOSIT, CREDIT), CHECK CARD WHEN SENDING.
+When you do conversion, set money amount in a receiver currency!
+
+Ideas to implement: limits by card, pay credit, cashback with payment, send by phone & card, open a new product (card, deposit, credit), check card when sending.
